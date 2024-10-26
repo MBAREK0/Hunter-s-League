@@ -1,0 +1,37 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-hunts-table
+      author: MBAREK0
+      changes:
+        - createTable:
+            tableName: hunts
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: participation_id
+                  type: uuid
+              - column:
+                  name: species_id
+                  type: uuid
+              - column:
+                  name: weight
+                  type: numeric
+        - addForeignKeyConstraint:
+            constraintName: hunts_participation_id_fkey
+            baseTableName: hunts
+            baseColumnNames: participation_id
+            referencedTableName: participation
+            referencedColumnNames: id
+            onDelete: cascade
+        - addForeignKeyConstraint:
+            constraintName: hunts_species_id_fkey
+            baseTableName: hunts
+            baseColumnNames: species_id
+            referencedTableName: species
+            referencedColumnNames: id
+            onDelete: cascade

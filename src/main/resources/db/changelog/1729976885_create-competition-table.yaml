@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-competition-table
+      author: MBAREK0
+      changes:
+        - createTable:
+            tableName: competition
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: location
+                  type: text
+              - column:
+                  name: date
+                  type: date
+              - column:
+                  name: code
+                  type: text
+              - column:
+                  name: species_type
+                  type: text
+              - column:
+                  name: min_participants
+                  type: integer
+              - column:
+                  name: max_participants
+                  type: integer
+              - column:
+                  name: open_registration
+                  type: boolean

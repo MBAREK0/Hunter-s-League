@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-participation-table
+      author: MBAREK0
+      changes:
+        - createTable:
+            tableName: participation
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+              - column:
+                  name: competition_id
+                  type: uuid
+              - column:
+                  name: score
+                  type: integer
+
+        - addForeignKeyConstraint:
+            baseTableName: participation
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: participation_user_id_fkey
+            onDelete: cascade
+
+        - addForeignKeyConstraint:
+            baseTableName: participation
+            baseColumnNames: competition_id
+            referencedTableName: competition
+            referencedColumnNames: id
+            constraintName: participation_competition_id_fkey
+            onDelete: cascade
+
+        - sql:
+            sql: "ALTER TABLE participation ADD CONSTRAINT participation_score_check CHECK (score >= 0);"

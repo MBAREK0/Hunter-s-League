@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.MBAREK0.web</groupId>
-	<artifactId>sb2</artifactId>
+	<artifactId>Hunter's League</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>sb2</name>
-	<description>sb2</description>
+	<name>Hunter's League</name>
+	<description>Hunter's League</description>
 	<url/>
 	<licenses>
 		<license/>

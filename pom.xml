@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.MBAREK0.web</groupId>
-	<artifactId>Hunter's League</artifactId>
+	<artifactId>huntersleague</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Hunter's League</name>
-	<description>Hunter's League</description>
+	<name>huntersleague</name>
+	<description>huntersleague</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -38,6 +38,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-security</artifactId>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
@@ -53,11 +61,33 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.11.5</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

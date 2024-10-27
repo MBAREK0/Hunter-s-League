@@ -1,11 +1,10 @@
 package com.mbarek0.web.huntersleague.model;
 
+import com.mbarek0.web.huntersleague.model.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
 
-import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 @Entity

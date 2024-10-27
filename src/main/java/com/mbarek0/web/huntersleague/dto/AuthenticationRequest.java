@@ -1,6 +1,5 @@
 package com.mbarek0.web.huntersleague.dto;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
 public class AuthenticationRequest {

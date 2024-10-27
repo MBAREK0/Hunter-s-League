@@ -21,4 +21,5 @@ public class FilterConfig {
         registrationBean.addUrlPatterns("/api/*");  // Apply to specific URL patterns as needed
         return registrationBean;
     }
+
 }

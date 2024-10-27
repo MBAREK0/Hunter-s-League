@@ -22,7 +22,7 @@ public class UserDTO {
     @Pattern(regexp = ".*[a-z].*", message = "Password must contain at least one lowercase letter.")
     @Pattern(regexp = ".*[A-Z].*", message = "Password must contain at least one uppercase letter.")
     @Pattern(regexp = ".*[0-9].*", message = "Password must contain at least one digit.")
-    private String password; // Encrypt this before saving
+    private String password;
 
     @NotBlank(message = "First name is required.")
     private String firstName;

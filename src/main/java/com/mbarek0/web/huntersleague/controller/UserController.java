@@ -23,7 +23,4 @@ public class UserController {
         return "User with ID: " ;
     }
 
-
-
-    // Other endpoints (e.g., get user details, update user, etc.) can be added here...
 }

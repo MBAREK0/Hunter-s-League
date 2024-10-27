@@ -5,6 +5,7 @@ import com.mbarek0.web.huntersleague.dto.AuthenticationResponse;
 import com.mbarek0.web.huntersleague.dto.UserDTO;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.UserRepository;
+import com.mbarek0.web.huntersleague.util.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +29,7 @@ public class AuthenticationService {
 
         User newUser = User.builder()
                 .username(userDTO.getUsername())
-                .password(userDTO.getPassword())
+                .password(PasswordUtil.hashPassword(userDTO.getPassword()))
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
                 .cin(userDTO.getCin())
@@ -58,7 +59,8 @@ public class AuthenticationService {
 
        return userRepository.findByUsername(username)
                 .map(user -> {
-                    if (user.getPassword().equals(password)) {
+                    if (PasswordUtil.checkPassword(password, user.getPassword()))
+                    {
                         String authToken = jwtService.generateToken(user.getUsername());
                         return AuthenticationResponse.builder()
                                 .token(authToken)

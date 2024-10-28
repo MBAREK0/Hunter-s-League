@@ -1,22 +1,30 @@
 package com.mbarek0.web.huntersleague.service;
 
+import com.mbarek0.web.huntersleague.exception.RooleNotFoundException;
+import com.mbarek0.web.huntersleague.exception.UserNotFoundException;
+import com.mbarek0.web.huntersleague.model.User;
+import com.mbarek0.web.huntersleague.model.enums.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
+@RequiredArgsConstructor
 @Service
 public class JwtService {
 
     private final String SECRET = "9j3hYtrVTWihkQs73f7ikrycNPSjUIFcSkQPgVUjRKGCHYLFI2qCn4xhAFYhTfvm";
+    private final UserService userService;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -64,6 +72,18 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    public Role extractRole(String username)  {
+        User user = userService.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Role role = user.getRole();
+        if (role == null) {
+            throw new RooleNotFoundException("Role not found");
+        }
+        return role;
+    }
+
+
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -77,4 +97,6 @@ public class JwtService {
             return false;
         }
     }
+
+
 }

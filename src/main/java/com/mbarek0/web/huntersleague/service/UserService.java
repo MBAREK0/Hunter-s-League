@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,28 +18,14 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-//    private final PasswordEncoder passwordEncoder;
 
-//    public User createUser(UserDTO userDTO) {
-//        // Check if the username already exists
-//        if (userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
-//            throw new RuntimeException("Username already exists."); // Handle this better in production
-//        }
-//
-//        User newUser = User.builder()
-//                .username(userDTO.getUsername())
-//                .password(passwordEncoder.encode(userDTO.getPassword())) // Encrypting the password
-//                .firstName(userDTO.getFirstName())
-//                .lastName(userDTO.getLastName())
-//                .cin(userDTO.getCin())
-//                .email(userDTO.getEmail())
-//                .nationality(userDTO.getNationality())
-//                .joinDate(LocalDate.now())
-//                .licenseExpirationDate(userDTO.getLicenseExpirationDate())
-//                .build();
-//
-//        return userRepository.save(newUser);
-//    }
+    public Optional<User> findByUsername(String userName) {
+        if (userName == null || userName.isEmpty()) {
+           throw new IllegalArgumentException("Username cannot be null");
+        }
+        return userRepository.findByUsername(userName);
 
-    // Additional methods (Read, Update, Delete) can be added here...
+    }
+
+
 }

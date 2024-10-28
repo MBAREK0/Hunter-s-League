@@ -1,5 +1,6 @@
 package com.mbarek0.web.huntersleague.filter;
 
+import com.mbarek0.web.huntersleague.model.enums.Role;
 import com.mbarek0.web.huntersleague.service.JwtService;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -39,8 +40,18 @@ public class JwtAuthenticationFilter implements Filter {
             if (jwtService.validateToken(token)) {
 
                 String username = jwtService.extractUsername(token);
+                Role role = jwtService.extractRole(username);
+
+                if (isAuthorized(role, requestURI)) {
+                    httpRequest.setAttribute("role", role);
+                } else {
+                    httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    return;
+                }
+
                 if (jwtService.isTokenValid(token, username)) {
                     httpRequest.setAttribute("username", username);
+
                 } else {
                     httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     return;
@@ -58,13 +69,27 @@ public class JwtAuthenticationFilter implements Filter {
         chain.doFilter(request, response);
     }
 
+    private boolean isAuthorized(Role role, String requestURI) {
+
+        if (role.equals(Role.ADMIN)) {
+            return true;
+        }
+
+        if (requestURI.startsWith("/api/member") && role.equals(Role.MEMBER)) {
+            return true;
+        }
+
+        if ((requestURI.startsWith("/api/jury") || requestURI.startsWith("/api/member")) && role.equals(Role.JURY)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public void init(FilterConfig filterConfig) {
-
     }
 
     @Override
     public void destroy() {
-        // Cleanup if necessary
     }
 }

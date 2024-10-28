@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -35,7 +36,7 @@ public class AuthenticationService {
                 .cin(userDTO.getCin())
                 .email(userDTO.getEmail())
                 .nationality(userDTO.getNationality())
-                .joinDate(LocalDate.now())
+                .joinDate(userDTO.getJoinDate())
                 .licenseExpirationDate(userDTO.getLicenseExpirationDate())
                 .build();
 

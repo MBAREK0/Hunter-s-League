@@ -6,6 +6,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -40,8 +41,8 @@ public class UserDTO {
     @NotBlank(message = "Nationality is required.")
     private String nationality;
 
-    private LocalDate joinDate;
+    private LocalDateTime joinDate;
 
     @Future(message = "License expiration date must be in the future.")
-    private LocalDate licenseExpirationDate;
+    private LocalDateTime licenseExpirationDate;
 }

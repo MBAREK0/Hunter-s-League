@@ -4,12 +4,14 @@ package com.mbarek0.web.huntersleague.service;
 import com.mbarek0.web.huntersleague.dto.UserDTO;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,4 +30,18 @@ public class UserService {
     }
 
 
+    public UserDTO createUser(@Valid UserDTO userDTO) {
+    }
+
+    public List<UserDTO> getAllUsers() {
+    }
+
+    public UserDTO getUserById(Long id) {
+    }
+
+    public UserDTO updateUser(Long id, @Valid UserDTO userDTO) {
+    }
+
+    public boolean deleteUser(Long id) {
+    }
 }

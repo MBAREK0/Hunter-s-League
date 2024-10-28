@@ -74,11 +74,9 @@ public class JwtAuthenticationFilter implements Filter {
         if (role.equals(Role.ADMIN)) {
             return true;
         }
-
         if (requestURI.startsWith("/api/member") && role.equals(Role.MEMBER)) {
             return true;
         }
-
         if ((requestURI.startsWith("/api/jury") || requestURI.startsWith("/api/member")) && role.equals(Role.JURY)) {
             return true;
         }

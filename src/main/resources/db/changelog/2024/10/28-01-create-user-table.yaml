@@ -1,0 +1,44 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-users-table
+      author: MBAREK0
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: text
+              - column:
+                  name: password
+                  type: text
+              - column:
+                  name: role
+                  type: text
+              - column:
+                  name: first_name
+                  type: text
+              - column:
+                  name: last_name
+                  type: text
+              - column:
+                  name: cin
+                  type: text
+              - column:
+                  name: email
+                  type: text
+              - column:
+                  name: nationality
+                  type: text
+              - column:
+                  name: join_date
+                  type: date
+              - column:
+                  name: license_expiration_date
+                  type: date

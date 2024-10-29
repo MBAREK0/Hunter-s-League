@@ -38,6 +38,7 @@ public class AuthenticationService {
                 .nationality(userDTO.getNationality())
                 .joinDate(userDTO.getJoinDate())
                 .licenseExpirationDate(userDTO.getLicenseExpirationDate())
+                .role(userDTO.getRole())
                 .build();
 
 

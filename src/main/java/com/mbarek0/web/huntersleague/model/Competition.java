@@ -15,6 +15,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "competitions")
 public class Competition {
     @Id
     @GeneratedValue

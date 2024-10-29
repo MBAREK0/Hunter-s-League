@@ -1,6 +1,8 @@
 package com.mbarek0.web.huntersleague.controller;
 
 import com.mbarek0.web.huntersleague.dto.UserDTO;
+import com.mbarek0.web.huntersleague.dto.UserResponse;
+import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import com.mbarek0.web.huntersleague.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +11,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import java.util.List;
 
@@ -28,7 +39,7 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
-        if (isAuthorized(request, Role.ADMIN)) {
+        if (!isAuthorized(request, Role.ADMIN)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         UserDTO createdUser = userService.createUser(userDTO);
@@ -41,12 +52,20 @@ public class UserController {
      * @return List of all users
      */
     @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(HttpServletRequest request) {
-        if (isAuthorized(request, Role.ADMIN)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity<UserResponse> getAllUsers(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+
+
+        if (!isAuthorized(request, Role.ADMIN)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        List<UserDTO> users = userService.getAllUsers();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+
+        UserResponse userResponse = userService.getAllUserResponse( page,  size );
+
+        return ResponseEntity.ok(userResponse);
     }
 
     /**
@@ -56,11 +75,13 @@ public class UserController {
      * @return User with the specified ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String id, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
 
-        UserDTO user = userService.getUserById(id);
+        UUID userId = UUID.fromString(id);
+
+        UserDTO user = userService.getUserById(userId);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -81,17 +102,18 @@ public class UserController {
      */
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @Valid @RequestBody UserDTO userDTO, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
 
-        UserDTO existingUser = userService.getUserById(id);
+        UUID userId = UUID.fromString(id);
+        UserDTO existingUser = userService.getUserById(userId);
         if (existingUser == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         if (role == Role.ADMIN || existingUser.getUsername().equals(username)) {
-            UserDTO updatedUser = userService.updateUser(id, userDTO);
+            UserDTO updatedUser = userService.updateUser(userId, userDTO);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -105,15 +127,17 @@ public class UserController {
      * @return No content
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String id, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
 
-        if (role != Role.ADMIN && !userService.getUserById(id).getUsername().equals(username)) {
+        UUID userId = UUID.fromString(id);
+
+        if (role != Role.ADMIN && !userService.getUserById(userId).getUsername().equals(username)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!userService.deleteUser(id)) {
+        if (!userService.deleteUser(userId)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
@@ -122,6 +146,6 @@ public class UserController {
 
     private boolean isAuthorized(HttpServletRequest request, Role requiredRole) {
         Role role = (Role) request.getAttribute("role");
-        return role != requiredRole;
+        return role.equals(requiredRole);
     }
 }

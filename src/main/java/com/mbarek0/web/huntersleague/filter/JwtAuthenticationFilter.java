@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String requestURI = httpRequest.getRequestURI();
-        if (requestURI.startsWith("/api/v1/auth/")) {
+        if (requestURI.startsWith("/api/auth/")) {
             chain.doFilter(request, response);
             return;
         }

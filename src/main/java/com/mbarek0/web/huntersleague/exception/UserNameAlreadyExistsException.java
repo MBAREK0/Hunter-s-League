@@ -1,4 +1,7 @@
 package com.mbarek0.web.huntersleague.exception;
 
-public class UserNameAlreadyExistsException {
+public class UserNameAlreadyExistsException extends RuntimeException {
+    public UserNameAlreadyExistsException(String s) {
+        super(s);
+    }
 }

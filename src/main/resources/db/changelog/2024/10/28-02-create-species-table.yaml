@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1730145142-create-species-table
+      author: MBAREK0
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: species
+      changes:
+        - createTable:
+            tableName: species
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: text
+              - column:
+                  name: category
+                  type: text
+              - column:
+                  name: minimum_weight
+                  type: numeric
+              - column:
+                  name: difficulty
+                  type: text
+              - column:
+                  name: points
+                  type: integer

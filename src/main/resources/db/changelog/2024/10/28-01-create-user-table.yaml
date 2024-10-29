@@ -1,7 +1,13 @@
 databaseChangeLog:
   - changeSet:
-      id: create-users-table
+      id: 1730145125-create-users-table
       author: MBAREK0
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: users
+
       changes:
         - createTable:
             tableName: users

@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1730145126-create-user-id-index
+      author: MBAREK0
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_users_id
+            tableName: users
+
+      changes:
+        - createIndex:
+            indexName: idx_users_id
+            tableName: users
+            columns:
+              - column:
+                  name: id
+
+  - changeSet:
+      id: 1730145127-create-user-email-index
+      author: MBAREK0
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_users_email
+            tableName: users
+
+      changes:
+        - createIndex:
+            indexName: idx_users_email
+            tableName: users
+            columns:
+              - column:
+                  name: email
+
+  - changeSet:
+      id: 1730145128-create-user-username-index
+      author: MBAREK0
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_users_username
+            tableName: users
+
+      changes:
+        - createIndex:
+            indexName: idx_users_username
+            tableName: users
+            columns:
+              - column:
+                  name: username

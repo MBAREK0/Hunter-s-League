@@ -1,4 +1,4 @@
-package com.mbarek0.web.huntersleague.dto;
+package com.mbarek0.web.huntersleague.web.vm.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthenticationResponse {
-
+public class TokenVM {
     private String token;
 }

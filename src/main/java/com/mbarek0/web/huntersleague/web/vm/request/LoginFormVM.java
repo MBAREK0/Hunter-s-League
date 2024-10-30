@@ -1,8 +1,8 @@
-package com.mbarek0.web.huntersleague.dto;
+package com.mbarek0.web.huntersleague.web.vm.request;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class AuthenticationRequest {
+public class LoginFormVM {
 
 
     @NotBlank(message = "Username cannot be blank")
@@ -10,10 +10,10 @@ public class AuthenticationRequest {
     @NotBlank(message = "Password cannot be blank")
     private String password;
 
-    public AuthenticationRequest() {
+    public LoginFormVM() {
     }
 
-    public AuthenticationRequest(String username, String password) {
+    public LoginFormVM(String username, String password) {
         this.username = username;
         this.password = password;
     }

@@ -1,9 +1,9 @@
-package com.mbarek0.web.huntersleague.controller;
+package com.mbarek0.web.huntersleague.web.rest.controller;
 
-import com.mbarek0.web.huntersleague.dto.AuthenticationRequest;
-import com.mbarek0.web.huntersleague.dto.AuthenticationResponse;
+import com.mbarek0.web.huntersleague.web.vm.request.LoginFormVM;
+import com.mbarek0.web.huntersleague.web.vm.response.TokenVM;
 import com.mbarek0.web.huntersleague.service.JwtService;
-import com.mbarek0.web.huntersleague.dto.UserDTO;
+import com.mbarek0.web.huntersleague.web.vm.request.RegisterVM;
 import com.mbarek0.web.huntersleague.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +19,18 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final JwtService jwtService;
 
+
+
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<TokenVM> register(@RequestBody @Valid RegisterVM userDTO) {
         return ResponseEntity.ok(authenticationService.register(userDTO));
     }
 
 
-
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest request) {
+    public ResponseEntity<TokenVM> login(@RequestBody @Valid LoginFormVM request) {
 
-        AuthenticationResponse response = authenticationService.login(request);
+        TokenVM response = authenticationService.login(request.getUsername(), request.getPassword());
         if (response.getToken() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

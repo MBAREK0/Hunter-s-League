@@ -1,7 +1,7 @@
 package com.mbarek0.web.huntersleague.service;
 
-import com.mbarek0.web.huntersleague.exception.RooleNotFoundException;
-import com.mbarek0.web.huntersleague.exception.UserNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.RooleNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.UserNotFoundException;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import io.jsonwebtoken.Claims;
@@ -16,7 +16,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 @RequiredArgsConstructor

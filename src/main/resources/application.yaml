@@ -26,3 +26,7 @@ spring:
       file: src/main/docker/compose.yaml
       enabled: false
       lifecycle-management: start_only
+
+  output:
+    ansi:
+      enabled: always

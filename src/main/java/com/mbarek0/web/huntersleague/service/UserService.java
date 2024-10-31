@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import java.util.Optional;
@@ -44,6 +45,12 @@ public class UserService {
         Page<User> userPage = userRepository.findAll(pageable);
 
         return userPage;
+    }
+
+    public Page<User> searchByUsernameOrCin(String searchKeyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        return userRepository.findByUsernameContainingOrEmailContaining(searchKeyword, searchKeyword, pageable);
     }
 
     public Optional<User> findByEmail(String email) {

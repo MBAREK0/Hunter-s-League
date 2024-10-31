@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
@@ -54,12 +55,21 @@ public class UserController {
      */
 
     @GetMapping
-    public ResponseEntity<Page<UserVM>> getAllUsers(HttpServletRequest request, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<UserVM>> getAllUsers(HttpServletRequest request,
+                                                    @RequestParam(required = false) String searchKeyword,
+                                                    @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "10") int size) {
 
         if (!isAuthorized(request, Role.ADMIN)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Page<User> users = userService.getAllUsers(page, size);
+
+        Page<User> users;
+        if (searchKeyword == null)
+            users = userService.getAllUsers(page, size);
+        else
+            users =  userService.searchByUsernameOrCin(searchKeyword, page, size);
+
         List<UserVM> userVMS = users.stream().map(userVMMapper::toUserVM).toList();
         Page<UserVM> userVMPage = new PageImpl<>(userVMS, users.getPageable(), users.getTotalElements());
         return ResponseEntity.ok(userVMPage);

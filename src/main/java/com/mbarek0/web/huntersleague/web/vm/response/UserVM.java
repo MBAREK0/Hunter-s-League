@@ -42,13 +42,12 @@ public class UserVM {
     @NotBlank(message = "CIN is required.")
     private String cin;
 
+
     @Email(message = "Email should be valid.")
     @NotBlank(message = "Email is required.")
     private String email;
 
     @NotBlank(message = "Nationality is required.")
     private String nationality;
-
-
 
 }

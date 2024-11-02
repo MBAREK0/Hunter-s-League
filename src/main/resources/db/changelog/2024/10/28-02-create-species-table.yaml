@@ -32,3 +32,9 @@ databaseChangeLog:
               - column:
                   name: points
                   type: integer
+
+        - addUniqueConstraint:
+            columnNames: name
+            tableName: species
+            constraintName: unique_species_name
+

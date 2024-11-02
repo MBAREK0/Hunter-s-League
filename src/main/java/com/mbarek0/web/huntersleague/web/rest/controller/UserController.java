@@ -1,6 +1,7 @@
 package com.mbarek0.web.huntersleague.web.rest.controller;
 
 import com.mbarek0.web.huntersleague.model.User;
+import com.mbarek0.web.huntersleague.util.Helper;
 import com.mbarek0.web.huntersleague.web.vm.mapper.UserVMMapper;
 import com.mbarek0.web.huntersleague.web.vm.response.UserVM;
 import com.mbarek0.web.huntersleague.model.enums.Role;
@@ -10,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +35,9 @@ public class UserController {
      * @param request HTTP request
      * @return Created user
      */
-
     @PostMapping
     public ResponseEntity<UserVM> createUser(@Valid @RequestBody UserVM userVm, HttpServletRequest request) {
-        if (!isAuthorized(request, Role.ADMIN)) {
+        if (!Helper.isAuthorized(request, Role.ADMIN)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         User user = userVMMapper.userVMToUser(userVm);
@@ -53,14 +52,13 @@ public class UserController {
      * @param request HTTP request
      * @return List of all users
      */
-
     @GetMapping
     public ResponseEntity<Page<UserVM>> getAllUsers(HttpServletRequest request,
                                                     @RequestParam(required = false) String searchKeyword,
                                                     @RequestParam(defaultValue = "0") int page,
                                                     @RequestParam(defaultValue = "10") int size) {
 
-        if (!isAuthorized(request, Role.ADMIN)) {
+        if (!Helper.isAuthorized(request, Role.ADMIN)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
@@ -107,7 +105,6 @@ public class UserController {
      * @param request HTTP request
      * @return Updated user
      */
-
     @PutMapping
     public ResponseEntity<UserVM> updateUser(@Valid @RequestBody UserVM userVm, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
@@ -134,7 +131,6 @@ public class UserController {
      * @param request HTTP request
      * @return No content
      */
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable String id, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
@@ -153,8 +149,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private boolean isAuthorized(HttpServletRequest request, Role requiredRole) {
-        Role role = (Role) request.getAttribute("role");
-        return role.equals(requiredRole);
-    }
+
+
 }

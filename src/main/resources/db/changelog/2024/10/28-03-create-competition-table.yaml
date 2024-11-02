@@ -38,3 +38,12 @@ databaseChangeLog:
               - column:
                   name: open_registration
                   type: boolean
+#          THIS IS NOT WORK WITH ANAS DATABASE BECAUSE IT'S NOT REAL
+        - addUniqueConstraint:
+            columnNames: code
+            tableName: competitions
+            constraintName: unique_code
+        - addUniqueConstraint:
+            columnNames: location, date
+            tableName: competitions
+            constraintName: unique_location_date

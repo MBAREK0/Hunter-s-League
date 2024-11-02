@@ -1,14 +1,12 @@
 package com.mbarek0.web.huntersleague.service;
 
 
-import com.mbarek0.web.huntersleague.web.exception.UserNotFoundException;
-import com.mbarek0.web.huntersleague.web.vm.request.RegisterVM;
-import com.mbarek0.web.huntersleague.web.exception.UserNameAlreadyExistsException;
+import com.mbarek0.web.huntersleague.web.exception.user.UserNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.user.UserNameAlreadyExistsException;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.UserRepository;
 import com.mbarek0.web.huntersleague.util.PasswordUtil;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import java.util.Optional;

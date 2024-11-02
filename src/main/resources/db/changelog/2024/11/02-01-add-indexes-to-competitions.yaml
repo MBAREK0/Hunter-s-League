@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1730583275-create-competitions-id-index
+      author: MBAREK0
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            indexName: idx_competions_id
+            tableName: competitions
+
+      changes:
+        - createIndex:
+            indexName: idx_competitions_id
+            tableName: competitions
+            columns:
+              - column:
+                  name: id

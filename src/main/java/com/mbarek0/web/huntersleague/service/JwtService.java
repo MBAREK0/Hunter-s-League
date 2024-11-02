@@ -1,7 +1,7 @@
 package com.mbarek0.web.huntersleague.service;
 
-import com.mbarek0.web.huntersleague.web.exception.RooleNotFoundException;
-import com.mbarek0.web.huntersleague.web.exception.UserNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.user.RooleNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.user.UserNotFoundException;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import io.jsonwebtoken.Claims;

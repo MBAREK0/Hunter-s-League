@@ -8,11 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UserVMMapper {
-
-    UserVMMapper INSTANCE = Mappers.getMapper(UserVMMapper.class);
-
     UserVM toUserVM(User user);
     User toUser(RegisterVM registerVM);
-    User registerVMToUser(RegisterVM registerVM);
     User userVMToUser(UserVM userVM);
 }

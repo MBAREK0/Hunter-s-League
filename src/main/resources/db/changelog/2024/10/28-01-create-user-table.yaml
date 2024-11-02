@@ -48,3 +48,11 @@ databaseChangeLog:
               - column:
                   name: license_expiration_date
                   type: date
+        - addUniqueConstraint:
+            columnNames: username
+            tableName: users
+            constraintName: unique_username
+        - addUniqueConstraint:
+            columnNames: email
+            tableName: users
+            constraintName: unique_email

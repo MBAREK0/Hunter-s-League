@@ -1,6 +1,8 @@
 package com.mbarek0.web.huntersleague.service;
 
-import com.mbarek0.web.huntersleague.web.exception.UserNameAlreadyExistsException;
+import com.mbarek0.web.huntersleague.model.enums.Role;
+import com.mbarek0.web.huntersleague.web.exception.user.UserNameAlreadyExistsException;
+import com.mbarek0.web.huntersleague.web.exception.user.UsernameOrPasswordInvalidException;
 import com.mbarek0.web.huntersleague.web.vm.mapper.UserVMMapper;
 import com.mbarek0.web.huntersleague.web.vm.response.TokenVM;
 import com.mbarek0.web.huntersleague.web.vm.request.RegisterVM;
@@ -9,11 +11,9 @@ import com.mbarek0.web.huntersleague.repository.UserRepository;
 import com.mbarek0.web.huntersleague.util.PasswordUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +34,11 @@ public class AuthenticationService {
                 });
 
         User newUser = userVMMapper.toUser(registerVM);
-        String password =  PasswordUtil.hashPassword(newUser.getPassword());
 
-        newUser.setPassword(password);
+        newUser.setPassword(PasswordUtil.hashPassword(newUser.getPassword()));
         newUser.setJoinDate(LocalDateTime.now());
         newUser.setLicenseExpirationDate(licenseExpirationDate);
+        newUser.setRole(Role.MEMBER);
 
         User user =  userRepository.save(newUser);
         String authToken = jwtService.generateToken(user.getUsername());
@@ -47,24 +47,15 @@ public class AuthenticationService {
 
     }
 
-
     public TokenVM login(String username, String password) {
-
-       return userRepository.findByUsername(username)
+        return userRepository.findByUsername(username)
+                .filter(user -> PasswordUtil.checkPassword(password, user.getPassword()))
                 .map(user -> {
-                    if (PasswordUtil.checkPassword(password, user.getPassword()))
-                    {
-                        String authToken = jwtService.generateToken(user.getUsername());
-                        return TokenVM.builder()
-                                .token(authToken)
-                                .build();
-                    }
+                    String authToken = jwtService.generateToken(user.getUsername());
                     return TokenVM.builder()
-                            .token("Invalid credentials.")
+                            .token(authToken)
                             .build();
                 })
-                .orElse(TokenVM.builder()
-                        .token("User not found.")
-                        .build());
+                .orElseThrow(() -> new UsernameOrPasswordInvalidException("Invalid credentials."));
     }
 }

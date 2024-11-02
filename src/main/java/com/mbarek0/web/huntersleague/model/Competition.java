@@ -4,10 +4,8 @@ import com.mbarek0.web.huntersleague.model.enums.SpeciesType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -37,7 +35,7 @@ public class Competition {
 
     private Boolean openRegistration;
 
-    @OneToMany(mappedBy = "competition")
+    @OneToMany(mappedBy = "competition", fetch = FetchType.LAZY)
     private List<Participation> participations;
 
 

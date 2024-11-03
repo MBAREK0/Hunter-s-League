@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -42,6 +43,9 @@ public class CompetitionService {
 
     public Competition createCompetition(Competition competition) {
 
+        if (competition.getMinParticipants() == null) throw   new FieldCannotBeNullException("Minimum participants cannot be null");
+        if (competition.getMaxParticipants() == null) throw   new FieldCannotBeNullException("Maximum participants cannot be null");
+
         validateParticipantLimits(competition.getMinParticipants(), competition.getMaxParticipants());
         validateCompetitionDate(competition.getDate());
         getCompetitionByCode(competition.getCode())
@@ -54,10 +58,11 @@ public class CompetitionService {
                     throw new CompetitionAlreadyExistsException("Competition with location " + c.getLocation() + " and date " + c.getDate() + " already exists");
                 });
 
+        String code = generateCompetitionCode(competition.getLocation(), competition.getDate());
+        competition.setCode(code);
         competition.setOpenRegistration(true);
         return competitionRepository.save(competition);
     }
-
 
     public Competition updateCompetition(Competition competitionDetails, UUID id) {
 
@@ -119,4 +124,12 @@ public class CompetitionService {
             throw new ParticipantLimitsException("Minimum participants must be less than maximum participants.");
         }
     }
+
+    private String generateCompetitionCode(String location, LocalDateTime date) {
+        String locationCode = location.toUpperCase();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String dateCode = date.format(formatter);
+        return locationCode + '-' + dateCode;
+    }
+
 }

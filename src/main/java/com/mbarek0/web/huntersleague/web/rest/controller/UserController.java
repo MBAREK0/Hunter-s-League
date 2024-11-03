@@ -3,7 +3,6 @@ package com.mbarek0.web.huntersleague.web.rest.controller;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.util.Helper;
 import com.mbarek0.web.huntersleague.web.vm.mapper.UserVMMapper;
-import com.mbarek0.web.huntersleague.web.vm.request.UpdateUserRequestVM;
 import com.mbarek0.web.huntersleague.web.vm.request.UserRequestVM;
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import com.mbarek0.web.huntersleague.service.UserService;
@@ -64,11 +63,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Page<User> users;
-        if (searchKeyword == null)
-            users = userService.getAllUsers(page, size);
-        else
-            users =  userService.searchByUsernameOrCin(searchKeyword, page, size);
+        Page<User> users = (searchKeyword == null)
+                ? userService.getAllUsers(page, size)
+                : userService.searchByUsernameOrCin(searchKeyword, page, size);
 
         List<UserResponseVM> userVMS = users.stream().map(userVMMapper::userToUserResponseVM).toList();
         Page<UserResponseVM> userVMPage = new PageImpl<>(userVMS, users.getPageable(), users.getTotalElements());
@@ -107,7 +104,7 @@ public class UserController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseVM> updateUser(@PathVariable UUID id,
-                                                     @Valid @RequestBody UpdateUserRequestVM userVm,
+                                                     @Valid @RequestBody UserRequestVM userVm,
                                                      HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
@@ -116,7 +113,7 @@ public class UserController {
         User existingUser = userService.findUserById(id);
 
         if (role == Role.ADMIN || existingUser.getUsername().equals(username)) {
-            User user = userVMMapper.updateUserRequestVMtoUser(userVm);
+            User user = userVMMapper.userRequestVMtoUser(userVm);
             User updateUser = userService.updateUser(user, id);
             UserResponseVM userVM = userVMMapper.userToUserResponseVM(updateUser);
             return new ResponseEntity<>(userVM, HttpStatus.OK);

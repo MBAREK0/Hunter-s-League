@@ -1,5 +1,6 @@
 package com.mbarek0.web.huntersleague.web.vm.request;
 
+import com.mbarek0.web.huntersleague.model.enums.SpeciesType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,6 @@ import java.util.UUID;
 @Setter
 public class CompetitionRequestVM {
 
-        @NotBlank(message = "Code is required.")
-        private String code;
 
         @NotBlank(message = "Location is required.")
         private String location;
@@ -25,7 +24,8 @@ public class CompetitionRequestVM {
         @NotNull(message = "Date is required.")
         private LocalDateTime date;
 
-        private String speciesType;
+        @NotNull(message = "Species type is required.")
+        private SpeciesType speciesType;
 
         @NotNull(message = "Minimum participants is required.")
         private Integer minParticipants;

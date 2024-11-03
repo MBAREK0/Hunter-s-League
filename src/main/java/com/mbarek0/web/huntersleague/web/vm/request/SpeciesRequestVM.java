@@ -2,29 +2,30 @@ package com.mbarek0.web.huntersleague.web.vm.request;
 
 import com.mbarek0.web.huntersleague.model.enums.Difficulty;
 import com.mbarek0.web.huntersleague.model.enums.SpeciesType;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.*;
-
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SpeciesVM {
+public class SpeciesRequestVM {
 
     @NotBlank(message = "Name is required.")
     private String name;
 
-    @NotBlank(message = "Category is required.")
+    @NotNull(message = "Category is required.")
     private SpeciesType category;
 
-    @NotBlank(message = "Minimum weight is required.")
+    @NotNull(message = "Minimum weight is required.")
+    @DecimalMin(value = "0.0", message = "Minimum weight must be greater than or equal to 0.0.")
     private Double minimumWeight;
 
-    @NotBlank(message = "Difficulty is required.")
+    @NotNull(message = "Difficulty is required.")
     private Difficulty difficulty;
 
-    @NotBlank(message = "Points are required.")
+    @NotNull(message = "Points are required.")
+    @Min(value = 0, message = "Points must be greater than or equal to 0.")
     private Integer points;
 }

@@ -1,10 +1,7 @@
 package com.mbarek0.web.huntersleague.web.vm.request;
 
 import com.mbarek0.web.huntersleague.model.enums.Role;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +33,7 @@ public class UserRequestVM {
     @NotBlank(message = "CIN is required.")
     private String cin;
 
+    @NotNull(message = "Role is required.")
     private Role role;
 
     @Email(message = "Email should be valid.")

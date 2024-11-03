@@ -113,22 +113,22 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 
-    //  ---------------  Exception
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("message", "Internal Server Error");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
-    }
-
-    //  ---------------  IllegalArgumentException
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("message", "Bad Request");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
-    }
+//    //  ---------------  Exception
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+//        Map<String, String> responseBody = new HashMap<>();
+//        responseBody.put("message", "Internal Server Error");
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
+//    }
+//
+//    //  ---------------  IllegalArgumentException
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)
+//    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+//        Map<String, String> responseBody = new HashMap<>();
+//        responseBody.put("message", "Bad Request");
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+//    }
 
 }

@@ -31,11 +31,9 @@ public class CompetitionController {
     public ResponseEntity<List<CompetitionResponseVM>> getAllCompetitions(@RequestParam(required = false) String searchKeyword,
                                                                           @RequestParam(defaultValue = "0") int page,
                                                                           @RequestParam(defaultValue = "10") int size) {
-        Page<Competition> competitions;
-        if (searchKeyword == null)
-            competitions = competitionService.getAllCompetitions(page, size);
-        else
-            competitions =  competitionService.searchByCodeOrLocationOrDate(searchKeyword, page, size);
+        Page<Competition> competitions= (searchKeyword == null)
+                ? competitionService.getAllCompetitions(page, size)
+                : competitionService.searchByCodeOrLocationOrDate(searchKeyword, page, size);
 
         List<CompetitionResponseVM> competitionVMs = competitions.stream()
                 .map(CompetitionVMMapper::toCompetitionResponseVM)

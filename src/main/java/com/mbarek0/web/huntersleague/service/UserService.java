@@ -1,6 +1,8 @@
 package com.mbarek0.web.huntersleague.service;
 
 
+import com.mbarek0.web.huntersleague.model.enums.Role;
+import com.mbarek0.web.huntersleague.web.exception.FieldCannotBeNullException;
 import com.mbarek0.web.huntersleague.web.exception.user.UserNotFoundException;
 import com.mbarek0.web.huntersleague.web.exception.user.UserNameAlreadyExistsException;
 import com.mbarek0.web.huntersleague.model.User;
@@ -8,6 +10,7 @@ import com.mbarek0.web.huntersleague.repository.UserRepository;
 import com.mbarek0.web.huntersleague.util.PasswordUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.apache.bcel.classfile.Field;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -63,7 +66,7 @@ public class UserService {
         }
 
         return userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
 
@@ -81,14 +84,17 @@ public class UserService {
         user.setPassword(password);
         user.setJoinDate(LocalDateTime.now());
         user.setLicenseExpirationDate(licenseExpirationDate);
+        user.setRole(Role.MEMBER);
 
         return userRepository.save(user);
     }
 
 
-    public User updateUser(User user) {
-        User existingUser = findUserById(user.getId());
+    public User updateUser(User user,UUID id) {
+        User existingUser = findUserById(id);
+
         if (existingUser == null) throw new UserNotFoundException("User not found");
+        if (user.getRole() == null) throw   new FieldCannotBeNullException("Role cannot be null");
 
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());

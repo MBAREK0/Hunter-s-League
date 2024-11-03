@@ -1,4 +1,4 @@
-package com.mbarek0.web.huntersleague.web.vm.response;
+package com.mbarek0.web.huntersleague.web.vm.request;
 
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import jakarta.validation.constraints.Email;
@@ -10,16 +10,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserVM {
-
-    private UUID id;
+public class UpdateUserRequestVM {
 
     @NotBlank(message = "Username is required.")
     private String username;
@@ -37,11 +33,10 @@ public class UserVM {
     @NotBlank(message = "Last name is required.")
     private String lastName;
 
-    private Role role;
-
     @NotBlank(message = "CIN is required.")
     private String cin;
 
+    private String role;
 
     @Email(message = "Email should be valid.")
     @NotBlank(message = "Email is required.")

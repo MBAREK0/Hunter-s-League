@@ -3,9 +3,11 @@ package com.mbarek0.web.huntersleague.web.rest.controller;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.util.Helper;
 import com.mbarek0.web.huntersleague.web.vm.mapper.UserVMMapper;
-import com.mbarek0.web.huntersleague.web.vm.response.UserVM;
+import com.mbarek0.web.huntersleague.web.vm.request.UpdateUserRequestVM;
+import com.mbarek0.web.huntersleague.web.vm.request.UserRequestVM;
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import com.mbarek0.web.huntersleague.service.UserService;
+import com.mbarek0.web.huntersleague.web.vm.response.UserResponseVM;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,13 +38,13 @@ public class UserController {
      * @return Created user
      */
     @PostMapping
-    public ResponseEntity<UserVM> createUser(@Valid @RequestBody UserVM userVm, HttpServletRequest request) {
+    public ResponseEntity<UserResponseVM> createUser(@Valid @RequestBody UserRequestVM userVm, HttpServletRequest request) {
         if (!Helper.isAuthorized(request, Role.ADMIN)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        User user = userVMMapper.userVMToUser(userVm);
+        User user = userVMMapper.userRequestVMtoUser(userVm);
         User createdUser = userService.createUser(user);
-        UserVM userVM = userVMMapper.toUserVM(createdUser);
+        UserResponseVM userVM = userVMMapper.userToUserResponseVM(createdUser);
 
         return new ResponseEntity<>(userVM, HttpStatus.CREATED);
     }
@@ -53,10 +55,10 @@ public class UserController {
      * @return List of all users
      */
     @GetMapping
-    public ResponseEntity<Page<UserVM>> getAllUsers(HttpServletRequest request,
-                                                    @RequestParam(required = false) String searchKeyword,
-                                                    @RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<Page<UserResponseVM>> getAllUsers(HttpServletRequest request,
+                                                           @RequestParam(required = false) String searchKeyword,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
 
         if (!Helper.isAuthorized(request, Role.ADMIN)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -68,8 +70,8 @@ public class UserController {
         else
             users =  userService.searchByUsernameOrCin(searchKeyword, page, size);
 
-        List<UserVM> userVMS = users.stream().map(userVMMapper::toUserVM).toList();
-        Page<UserVM> userVMPage = new PageImpl<>(userVMS, users.getPageable(), users.getTotalElements());
+        List<UserResponseVM> userVMS = users.stream().map(userVMMapper::userToUserResponseVM).toList();
+        Page<UserResponseVM> userVMPage = new PageImpl<>(userVMS, users.getPageable(), users.getTotalElements());
         return ResponseEntity.ok(userVMPage);
     }
 
@@ -80,19 +82,17 @@ public class UserController {
      * @return User with the specified ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<UserVM> getUserById(@PathVariable String id, HttpServletRequest request) {
+    public ResponseEntity<UserResponseVM> getUserById(@PathVariable UUID id, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
 
-        UUID userId = UUID.fromString(id);
-
-        User user = userService.findUserById(userId);
+        User user = userService.findUserById(id);
         if (user == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
         if (role == Role.ADMIN || role == Role.JURY || user.getUsername().equals(username)) {
-            UserVM userVM = userVMMapper.toUserVM(user);
+            UserResponseVM userVM = userVMMapper.userToUserResponseVM(user);
             return new ResponseEntity<>(userVM, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -105,24 +105,26 @@ public class UserController {
      * @param request HTTP request
      * @return Updated user
      */
-    @PutMapping
-    public ResponseEntity<UserVM> updateUser(@Valid @RequestBody UserVM userVm, HttpServletRequest request) {
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponseVM> updateUser(@PathVariable UUID id,
+                                                     @Valid @RequestBody UpdateUserRequestVM userVm,
+                                                     HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
 
-        User existingUser = userService.findUserById(userVm.getId());
-        if (existingUser == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+
+        User existingUser = userService.findUserById(id);
 
         if (role == Role.ADMIN || existingUser.getUsername().equals(username)) {
-            User user = userVMMapper.userVMToUser(userVm);
-            User updateUser = userService.updateUser(user);
-            UserVM userVM = userVMMapper.toUserVM(updateUser);
+            User user = userVMMapper.updateUserRequestVMtoUser(userVm);
+            User updateUser = userService.updateUser(user, id);
+            UserResponseVM userVM = userVMMapper.userToUserResponseVM(updateUser);
             return new ResponseEntity<>(userVM, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
+
+
     }
 
     /**
@@ -132,17 +134,15 @@ public class UserController {
      * @return No content
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id, HttpServletRequest request) {
         Role role = (Role) request.getAttribute("role");
         String username = (String) request.getAttribute("username");
 
-        UUID userId = UUID.fromString(id);
-
-        if (role != Role.ADMIN && !userService.findUserById(userId).getUsername().equals(username)) {
+        if (role != Role.ADMIN && !userService.findUserById(id).getUsername().equals(username)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!userService.deleteUser(userId)) {
+        if (!userService.deleteUser(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

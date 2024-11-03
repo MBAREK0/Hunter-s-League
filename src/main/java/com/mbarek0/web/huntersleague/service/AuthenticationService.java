@@ -33,7 +33,12 @@ public class AuthenticationService {
                     throw new UserNameAlreadyExistsException("User already exists");
                 });
 
-        User newUser = userVMMapper.toUser(registerVM);
+        userService.findByEmail(registerVM.getEmail())
+                .ifPresent(value -> {
+                    throw new UserNameAlreadyExistsException("Email already exists");
+                });
+
+        User newUser = userVMMapper.registerVMtoUser(registerVM);
 
         newUser.setPassword(PasswordUtil.hashPassword(newUser.getPassword()));
         newUser.setJoinDate(LocalDateTime.now());

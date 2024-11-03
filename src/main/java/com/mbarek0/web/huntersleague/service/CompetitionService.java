@@ -3,8 +3,11 @@ package com.mbarek0.web.huntersleague.service;
 import com.mbarek0.web.huntersleague.model.Competition;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.CompetitionRepository;
+import com.mbarek0.web.huntersleague.web.exception.FieldCannotBeNullException;
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionAlreadyExistsException;
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.competition.OnlyOneCompetitionCanBeScheduledPerWeekException;
+import com.mbarek0.web.huntersleague.web.exception.competition.ParticipantLimitsException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +42,8 @@ public class CompetitionService {
 
     public Competition createCompetition(Competition competition) {
 
+        validateParticipantLimits(competition.getMinParticipants(), competition.getMaxParticipants());
+        validateCompetitionDate(competition.getDate());
         getCompetitionByCode(competition.getCode())
                 .ifPresent(c -> {
                     throw new CompetitionAlreadyExistsException("Competition with code " + c.getCode() + " already exists");
@@ -49,13 +54,16 @@ public class CompetitionService {
                     throw new CompetitionAlreadyExistsException("Competition with location " + c.getLocation() + " and date " + c.getDate() + " already exists");
                 });
 
+        competition.setOpenRegistration(true);
         return competitionRepository.save(competition);
     }
 
 
-    public Competition updateCompetition(Competition competitionDetails) {
+    public Competition updateCompetition(Competition competitionDetails, UUID id) {
 
-        Competition competition = getCompetitionById(competitionDetails.getId());
+        if (competitionDetails.getSpeciesType() == null) throw   new FieldCannotBeNullException("Species type cannot be null");
+
+        Competition competition = getCompetitionById(id);
         competition.setCode(competitionDetails.getCode());
         competition.setLocation(competitionDetails.getLocation());
         competition.setDate(competitionDetails.getDate());
@@ -64,6 +72,9 @@ public class CompetitionService {
         competition.setMaxParticipants(competitionDetails.getMaxParticipants());
         competition.setOpenRegistration(competitionDetails.getOpenRegistration());
 
+        validateParticipantLimits(competition.getMinParticipants(), competition.getMaxParticipants());
+        validateCompetitionDate(competition.getDate());
+
         getCompetitionByCode(competition.getCode())
                 .ifPresent(c -> {
                     throw new CompetitionAlreadyExistsException("Competition with code " + c.getCode() + " already exists");
@@ -73,7 +84,7 @@ public class CompetitionService {
                 .ifPresent(c -> {
                     throw new CompetitionAlreadyExistsException("Competition with location " + c.getLocation() + " and date " + c.getDate() + " already exists");
                 });
-        
+
         return competitionRepository.save(competition);
     }
 
@@ -91,5 +102,21 @@ public class CompetitionService {
 
     public Optional<Competition> getCompetitionByLocationAndDate(String location, LocalDateTime date) {
         return competitionRepository.findByLocationAndDate(location, date);
+    }
+
+    private void validateCompetitionDate(LocalDateTime competitionDate) {
+        boolean competitionExists = competitionRepository.existsByDateBetween(
+                competitionDate.minusDays(7), competitionDate.plusDays(7)
+        );
+
+        if (competitionExists) {
+            throw new OnlyOneCompetitionCanBeScheduledPerWeekException("Only one competition can be scheduled per week.");
+        }
+    }
+
+    private void validateParticipantLimits(int minParticipants, int maxParticipants) {
+        if (minParticipants >= maxParticipants) {
+            throw new ParticipantLimitsException("Minimum participants must be less than maximum participants.");
+        }
     }
 }

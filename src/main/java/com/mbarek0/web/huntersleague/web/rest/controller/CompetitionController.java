@@ -2,13 +2,14 @@ package com.mbarek0.web.huntersleague.web.rest.controller;
 
 
 import com.mbarek0.web.huntersleague.model.Competition;
-import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.model.enums.Role;
 import com.mbarek0.web.huntersleague.service.CompetitionService;
 import com.mbarek0.web.huntersleague.util.Helper;
 import com.mbarek0.web.huntersleague.web.vm.mapper.CompetitionVMMapper;
-import com.mbarek0.web.huntersleague.web.vm.response.CompetitionVM;
+import com.mbarek0.web.huntersleague.web.vm.request.CompetitionRequestVM;
+import com.mbarek0.web.huntersleague.web.vm.response.CompetitionResponseVM;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -24,48 +25,50 @@ import java.util.UUID;
 public class CompetitionController {
 
     private final CompetitionService competitionService;
+    private final CompetitionVMMapper CompetitionVMMapper;
 
     @GetMapping
-    public ResponseEntity<List<CompetitionVM>> getAllCompetitions( @RequestParam(required = false) String searchKeyword,
-                                                                   @RequestParam(defaultValue = "0") int page,
-                                                                   @RequestParam(defaultValue = "10") int size) {
+    public ResponseEntity<List<CompetitionResponseVM>> getAllCompetitions(@RequestParam(required = false) String searchKeyword,
+                                                                          @RequestParam(defaultValue = "0") int page,
+                                                                          @RequestParam(defaultValue = "10") int size) {
         Page<Competition> competitions;
         if (searchKeyword == null)
             competitions = competitionService.getAllCompetitions(page, size);
         else
             competitions =  competitionService.searchByCodeOrLocationOrDate(searchKeyword, page, size);
 
-        List<CompetitionVM> competitionVMs = competitions.stream()
-                .map(CompetitionVMMapper.INSTANCE::toCompetitionVM)
+        List<CompetitionResponseVM> competitionVMs = competitions.stream()
+                .map(CompetitionVMMapper::toCompetitionResponseVM)
                 .toList();
         return ResponseEntity.ok(competitionVMs);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CompetitionVM> getCompetitionById(@PathVariable UUID id) {
+    public ResponseEntity<CompetitionResponseVM> getCompetitionById(@PathVariable UUID id) {
         Competition competition = competitionService.getCompetitionById(id);
-        return ResponseEntity.ok(CompetitionVMMapper.INSTANCE.toCompetitionVM(competition));
+        return ResponseEntity.ok(CompetitionVMMapper.toCompetitionResponseVM(competition));
     }
 
     @PostMapping
-    public ResponseEntity<CompetitionVM> createCompetition(HttpServletRequest request,@RequestBody CompetitionVM competition) {
+    public ResponseEntity<CompetitionResponseVM> createCompetition(HttpServletRequest request, @Valid @RequestBody CompetitionRequestVM competition) {
         if (!Helper.isAuthorized(request, Role.ADMIN)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
-        Competition createdCompetition = competitionService.createCompetition(CompetitionVMMapper.INSTANCE.competitionVMToCompetition(competition));
-        return ResponseEntity.status(HttpStatus.CREATED).body(CompetitionVMMapper.INSTANCE.toCompetitionVM(createdCompetition));
+        Competition createdCompetition = competitionService.createCompetition(CompetitionVMMapper.CompetitionRequestVMToCompetition(competition));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CompetitionVMMapper.toCompetitionResponseVM(createdCompetition));
     }
 
-    @PutMapping
-    public ResponseEntity<CompetitionVM> updateCompetition(HttpServletRequest request,
-                                                           @RequestBody CompetitionVM competitionDetails) {
+    @PutMapping("/{id}")
+    public ResponseEntity<CompetitionResponseVM> updateCompetition(@PathVariable UUID id,
+                                                                    HttpServletRequest request,
+                                                                  @Valid @RequestBody CompetitionRequestVM competitionDetails) {
         if (!Helper.isAuthorized(request, Role.ADMIN)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
 
-        Competition competition = CompetitionVMMapper.INSTANCE.competitionVMToCompetition(competitionDetails);
-        Competition updatedCompetition = competitionService.updateCompetition(competition);
-        return ResponseEntity.ok(CompetitionVMMapper.INSTANCE.toCompetitionVM(updatedCompetition));
+        Competition competition = CompetitionVMMapper.CompetitionRequestVMToCompetition(competitionDetails);
+        Competition updatedCompetition = competitionService.updateCompetition(competition,id);
+        return ResponseEntity.ok(CompetitionVMMapper.toCompetitionResponseVM(updatedCompetition));
 
     }
 

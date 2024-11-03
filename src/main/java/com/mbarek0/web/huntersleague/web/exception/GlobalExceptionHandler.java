@@ -1,7 +1,7 @@
 package com.mbarek0.web.huntersleague.web.exception;
 
-import com.mbarek0.web.huntersleague.web.exception.user.UserNameAlreadyExistsException;
-import com.mbarek0.web.huntersleague.web.exception.user.UsernameOrPasswordInvalidException;
+import com.mbarek0.web.huntersleague.web.exception.competition.*;
+import com.mbarek0.web.huntersleague.web.exception.user.*;
 import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,71 +11,124 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.management.relation.RoleNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-//  ---------------  MethodArgumentNotValidException
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-
-        ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errors.put(error.getField(), error.getDefaultMessage());
-        });
-
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-//  ---------------  ConfigDataResourceNotFoundException
-    @ExceptionHandler(ConfigDataResourceNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ConfigDataResourceNotFoundException ex) {
-        Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("message", ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
-    }
-
-//  ---------------  UserNameAlreadyExistsException
+    /** --------------------------------------- User Exceptions  */
+    //  ---------------  UserNameAlreadyExistsException
     @ExceptionHandler(UserNameAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<Map<String, String>> handleUserNameAlreadyExistsException(
-            UserNameAlreadyExistsException ex, WebRequest request) {
+            UserNameAlreadyExistsException ex) {
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(responseBody);
     }
 
-//  ---------------  handleUsernameOrPasswordInvalidException
+    //  ---------------  UsernameOrPasswordInvalidException
     @ExceptionHandler(UsernameOrPasswordInvalidException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<Map<String, String>> handleUsernameOrPasswordInvalidException(
-            UsernameOrPasswordInvalidException ex, WebRequest request) {
+            UsernameOrPasswordInvalidException ex) {
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", ex.getMessage());
-
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
     }
-//  ---------------  Exception
+
+    //  ---------------  RoleNotFoundException
+    @ExceptionHandler(RoleNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleRoleNotFoundException(
+            RoleNotFoundException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
+    }
+
+    //  ---------------  UserNotFoundException
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(
+            UserNotFoundException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    /** --------------------------------------- Competition Exceptions  */
+    //  ---------------  CompetitionAlreadyExistsException
+    @ExceptionHandler(CompetitionAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Map<String, String>> handleCompetitionAlreadyExistsException(
+            CompetitionAlreadyExistsException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseBody);
+    }
+
+    // --------------- CompetitionNotFoundException
+    @ExceptionHandler(CompetitionNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleCompetitionNotFoundException(
+            CompetitionNotFoundException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
+    }
+
+    // ---------------  OnlyOneCompetitionCanBeScheduledPerWeekException
+    @ExceptionHandler(OnlyOneCompetitionCanBeScheduledPerWeekException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<Map<String, String>> handleOnlyOneCompetitionCanBeScheduledPerWeekException(
+            OnlyOneCompetitionCanBeScheduledPerWeekException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(responseBody);
+    }
+
+    // ---------------  ParticipantLimitsException
+    @ExceptionHandler(ParticipantLimitsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleParticipantLimitsException(
+            ParticipantLimitsException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    /** --------------------------------------- Global Exceptions  */
+
+    //  ---------------  FieldCannotBeNullException
+    @ExceptionHandler(FieldCannotBeNullException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleFieldCannotBeNullException(
+            FieldCannotBeNullException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    //  ---------------  Exception
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
         Map<String, String> responseBody = new HashMap<>();
-        responseBody.put("message", ex.getMessage());
+        responseBody.put("message", "Internal Server Error");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseBody);
     }
 
-
-//  ---------------  IllegalArgumentException
+    //  ---------------  IllegalArgumentException
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", "Bad Request");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
-
 
 }

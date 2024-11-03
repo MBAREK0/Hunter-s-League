@@ -17,4 +17,6 @@ public interface CompetitionRepository extends JpaRepository<Competition, UUID> 
     Optional<Competition> findByCode(String code);
 
     Optional<Competition> findByLocationAndDate(String location, LocalDateTime date);
+
+    boolean existsByDateBetween(LocalDateTime localDateTime, LocalDateTime localDateTime1);
 }

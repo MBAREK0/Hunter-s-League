@@ -101,6 +101,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
     }
 
+    // ---------------  CompetitionIsNotOpenForRegistrationException
+    @ExceptionHandler(CompetitionIsNotOpenForRegistrationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleCompetitionIsNotOpenForRegistrationException(
+            CompetitionIsNotOpenForRegistrationException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    // ---------------  HuntWeightException
+    @ExceptionHandler(HuntWeightException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, String>> handleHuntWeightException(
+            HuntWeightException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
     /** --------------------------------------- Global Exceptions  */
 
     //  ---------------  FieldCannotBeNullException

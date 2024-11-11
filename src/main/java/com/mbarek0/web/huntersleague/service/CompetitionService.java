@@ -3,6 +3,7 @@ package com.mbarek0.web.huntersleague.service;
 import com.mbarek0.web.huntersleague.model.Competition;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.CompetitionRepository;
+import com.mbarek0.web.huntersleague.repository.dto.CompetitionRepoDTO;
 import com.mbarek0.web.huntersleague.web.exception.FieldCannotBeNullException;
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionAlreadyExistsException;
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionNotFoundException;
@@ -79,7 +80,8 @@ public class CompetitionService {
 
         validateParticipantLimits(competition.getMinParticipants(), competition.getMaxParticipants());
         validateCompetitionDate(competition.getDate());
-
+        String code = generateCompetitionCode(competition.getLocation(), competition.getDate());
+        competition.setCode(code);
         getCompetitionByCode(competition.getCode())
                 .ifPresent(c -> {
                     throw new CompetitionAlreadyExistsException("Competition with code " + c.getCode() + " already exists");
@@ -132,4 +134,7 @@ public class CompetitionService {
         return locationCode + '-' + dateCode;
     }
 
+    public CompetitionRepoDTO getCompetitionDetailsById(UUID id) {
+        return competitionRepository.findByIdRepoDTO(id);
+    }
 }

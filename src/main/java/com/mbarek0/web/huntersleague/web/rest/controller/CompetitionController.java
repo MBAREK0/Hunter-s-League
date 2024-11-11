@@ -3,6 +3,7 @@ package com.mbarek0.web.huntersleague.web.rest.controller;
 
 import com.mbarek0.web.huntersleague.model.Competition;
 import com.mbarek0.web.huntersleague.model.enums.Role;
+import com.mbarek0.web.huntersleague.repository.dto.CompetitionRepoDTO;
 import com.mbarek0.web.huntersleague.service.CompetitionService;
 import com.mbarek0.web.huntersleague.util.Helper;
 import com.mbarek0.web.huntersleague.web.vm.mapper.CompetitionVMMapper;
@@ -46,6 +47,13 @@ public class CompetitionController {
         Competition competition = competitionService.getCompetitionById(id);
         return ResponseEntity.ok(CompetitionVMMapper.toCompetitionResponseVM(competition));
     }
+    @GetMapping("/details/{id}")
+    public ResponseEntity<CompetitionRepoDTO> getCompetitionDetailsById(@PathVariable UUID id) {
+        CompetitionRepoDTO competition = competitionService.getCompetitionDetailsById(id);
+        return ResponseEntity.ok(competition);
+    }
+
+
 
     @PostMapping
     public ResponseEntity<CompetitionResponseVM> createCompetition(HttpServletRequest request, @Valid @RequestBody CompetitionRequestVM competition) {

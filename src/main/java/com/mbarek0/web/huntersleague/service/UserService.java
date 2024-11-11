@@ -71,13 +71,14 @@ public class UserService {
 
 
     public User createUser(User user) {
+        if (user.getRole() == null) throw new FieldCannotBeNullException("Role cannot be null");
 
-       findByUsername(user.getUsername()).ifPresent(value -> {
+        findByUsername(user.getUsername()).ifPresent(value -> {
             throw new UserNameAlreadyExistsException("User with this username already exists");
         });
 
        findByEmail(user.getEmail()).ifPresent(value -> {
-            throw new IllegalArgumentException("User with this email already exists");
+            throw new UserNameAlreadyExistsException("User with this email already exists");
         });
 
         String password =  PasswordUtil.hashPassword(user.getPassword());
@@ -95,6 +96,18 @@ public class UserService {
 
         if (existingUser == null) throw new UserNotFoundException("User not found");
         if (user.getRole() == null) throw   new FieldCannotBeNullException("Role cannot be null");
+
+        if (existingUser.getUsername() != user.getUsername()) {
+            findByUsername(user.getUsername()).ifPresent(value -> {
+                throw new UserNameAlreadyExistsException("User with this username already exists");
+            });
+        }
+
+        if (existingUser.getEmail() != user.getEmail()) {
+            findByEmail(user.getEmail()).ifPresent(value -> {
+                throw new UserNameAlreadyExistsException("User with this email already exists");
+            });
+        }
 
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());

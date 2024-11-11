@@ -15,6 +15,12 @@ import java.util.UUID;
 @Table(name = "participations")
 public class Participation{
 
+    public Participation(Competition competition, User user, Double score) {
+        this.competition = competition;
+        this.user = user;
+        this.score = score;
+    }
+
     @Id @GeneratedValue(strategy =  GenerationType.UUID)
     private UUID id;
 

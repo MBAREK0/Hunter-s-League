@@ -9,6 +9,7 @@ import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionAlread
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionNotFoundException;
 import com.mbarek0.web.huntersleague.web.exception.competition.OnlyOneCompetitionCanBeScheduledPerWeekException;
 import com.mbarek0.web.huntersleague.web.exception.competition.ParticipantLimitsException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class CompetitionService {
 
     private final CompetitionRepository competitionRepository;
+    private final JobProcessorService jobProcessorService;
 
     public Page<Competition> getAllCompetitions(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
@@ -34,7 +36,7 @@ public class CompetitionService {
 
     public Page<Competition> searchByCodeOrLocationOrDate(String searchKeyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        return competitionRepository.findByCodeContainingOrLocationContaining(searchKeyword, searchKeyword, pageable);
+        return competitionRepository.findByCodeContainingOrLocationContainingAndDeletedFalse(searchKeyword, searchKeyword, pageable);
     }
 
     public Competition getCompetitionById(UUID id) {
@@ -96,23 +98,20 @@ public class CompetitionService {
     }
 
     public void deleteCompetition(UUID id) {
-        // delete all related data ...................
-        //
-        Competition competition = getCompetitionById(id);
-        competitionRepository.delete(competition);
+        competitionRepository.softDeleteById(id);
     }
 
 
     public Optional<Competition> getCompetitionByCode(String code) {
-        return competitionRepository.findByCode(code);
+        return competitionRepository.findByCodeAndDeletedFalse(code);
     }
 
     public Optional<Competition> getCompetitionByLocationAndDate(String location, LocalDateTime date) {
-        return competitionRepository.findByLocationAndDate(location, date);
+        return competitionRepository.findByLocationAndDateAndDeletedFalse(location, date);
     }
 
     private void validateCompetitionDate(LocalDateTime competitionDate) {
-        boolean competitionExists = competitionRepository.existsByDateBetween(
+        boolean competitionExists = competitionRepository.existsByDateBetweenAndDeletedFalse(
                 competitionDate.minusDays(7), competitionDate.plusDays(7)
         );
 
@@ -136,5 +135,17 @@ public class CompetitionService {
 
     public CompetitionRepoDTO getCompetitionDetailsById(UUID id) {
         return competitionRepository.findByIdRepoDTO(id);
+    }
+
+    @Transactional
+    public void markCompetitionAsDeleted(UUID competitionId) {
+        // Mark the competition as deleted
+        competitionRepository.findById(competitionId).ifPresent(competition -> {
+            competition.setDeleted(true);
+            competitionRepository.save(competition);
+
+            // Create a job for cascading delete
+            jobProcessorService.createCascadeDeleteJob(competitionId, "COMPETITION");
+        });
     }
 }

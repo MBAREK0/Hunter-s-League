@@ -38,6 +38,9 @@ public class Competition {
     @OneToMany(mappedBy = "competition", fetch = FetchType.LAZY)
     private List<Participation> participations;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
 
 
 }

@@ -33,6 +33,7 @@ databaseChangeLog:
             referencedTableName: participations
             referencedColumnNames: id
             onDelete: SET NULL
+            onUpdate: CASCADE
         - addForeignKeyConstraint:
             constraintName: hunts_species_id_fkey
             baseTableName: hunts
@@ -40,3 +41,4 @@ databaseChangeLog:
             referencedTableName: species
             referencedColumnNames: id
             onDelete: SET NULL
+            onUpdate: CASCADE

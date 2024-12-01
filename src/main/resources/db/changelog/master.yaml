@@ -11,3 +11,5 @@ databaseChangeLog:
         file: db/changelog/2024/10/28-05-create-hunts-table.yaml
   - include:
       file: db/changelog/2024/10/30-01-add-indexes-to-users.yaml
+  - include:
+        file: db/changelog/2024/11/13-01-add-column-deleted-to-all-tables.yaml

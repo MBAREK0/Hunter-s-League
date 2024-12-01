@@ -24,4 +24,7 @@ public class Hunt {
 
     @ManyToOne
     private Participation participation;
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 }

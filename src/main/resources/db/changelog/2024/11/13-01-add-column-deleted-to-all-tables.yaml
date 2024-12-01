@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1731496746-add-column-deleted-to-all-tables
+      author: MBAREK0
+      changes:
+        - addColumn:
+            tableName: "competitions"
+            columns:
+              - column:
+                  name: "deleted"
+                  type: "BOOLEAN"
+                  defaultValueBoolean: "false"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: "hunts"
+            columns:
+              - column:
+                  name: "deleted"
+                  type: "BOOLEAN"
+                  defaultValueBoolean: "false"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: "participations"
+            columns:
+              - column:
+                  name: "deleted"
+                  type: "BOOLEAN"
+                  defaultValueBoolean: "false"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: "species"
+            columns:
+              - column:
+                  name: "deleted"
+                  type: "BOOLEAN"
+                  defaultValueBoolean: "false"
+                  constraints:
+                    nullable: false
+
+        - addColumn:
+            tableName: "users"
+            columns:
+              - column:
+                  name: "deleted"
+                  type: "BOOLEAN"
+                  defaultValueBoolean: "false"
+                  constraints:
+                    nullable: false

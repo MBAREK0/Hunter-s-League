@@ -139,7 +139,7 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
-        if (!userService.deleteUser(id)) {
+        if (!userService.markUserAsDeleted(id)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 

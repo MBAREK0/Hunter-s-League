@@ -49,4 +49,7 @@ public class User {
     @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     private List<Participation> participations;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
 }

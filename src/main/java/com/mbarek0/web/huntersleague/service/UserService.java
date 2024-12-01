@@ -28,13 +28,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LocalDateTime licenseExpirationDate = LocalDateTime.now().plusYears(1);
-
+    private final JobProcessorService jobProcessorService;
 
     public Optional<User> findByUsername(String userName) {
         if (userName == null || userName.isEmpty()) {
            throw new IllegalArgumentException("Username cannot be null");
         }
-        return userRepository.findByUsername(userName);
+        return userRepository.findByUsernameAndDeletedFalse(userName);
 
     }
 
@@ -50,14 +50,14 @@ public class UserService {
     public Page<User> searchByUsernameOrCin(String searchKeyword, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
-        return userRepository.findByUsernameContainingOrEmailContaining(searchKeyword, searchKeyword, pageable);
+        return userRepository.findByUsernameContainingOrEmailContainingAndDeletedFalse(searchKeyword, searchKeyword, pageable);
     }
 
     public Optional<User> findByEmail(String email) {
         if (email == null || email.isEmpty()) {
             throw new IllegalArgumentException("Email cannot be null");
         }
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmailAndDeletedFalse(email);
     }
 
     public User findUserById(UUID id) {
@@ -123,13 +123,28 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
+
+//  @Transactional
+//    public void markCompetitionAsDeleted(UUID competitionId) {
+//        // Mark the competition as deleted
+//        competitionRepository.findById(competitionId).ifPresent(competition -> {
+//            competition.setDeleted(true);
+//            competitionRepository.save(competition);
+//
+//            // Create a job for cascading delete
+//            jobProcessorService.createCascadeDeleteJob(competitionId, "COMPETITION");
+//        });
+//    }
+
     @Transactional
-    public boolean deleteUser(UUID userId) {
-        // delete all related data ...................
-        //
+    public boolean markUserAsDeleted(UUID userId) {
         User user = findUserById(userId);
-        if (user == null) throw new UserNotFoundException("User not found");
-        userRepository.delete(user);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        user.setDeleted(true);
+        userRepository.save(user);
+        jobProcessorService.createCascadeDeleteJob(userId, "USER");
         return true;
     }
 }

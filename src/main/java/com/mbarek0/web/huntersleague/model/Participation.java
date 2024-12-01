@@ -35,4 +35,7 @@ public class Participation{
 
     private Double score;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
 }

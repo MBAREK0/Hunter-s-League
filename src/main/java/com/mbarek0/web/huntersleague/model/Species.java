@@ -32,4 +32,7 @@ public class Species {
 
     private Integer points;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
+
 }

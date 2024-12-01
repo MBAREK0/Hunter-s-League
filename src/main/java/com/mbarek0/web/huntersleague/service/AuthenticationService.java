@@ -53,7 +53,7 @@ public class AuthenticationService {
     }
 
     public TokenVM login(String username, String password) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameAndDeletedFalse(username)
                 .filter(user -> PasswordUtil.checkPassword(password, user.getPassword()))
                 .map(user -> {
                     String authToken = jwtService.generateToken(user.getUsername());

@@ -80,7 +80,7 @@ public class CompetitionController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCompetition(@PathVariable UUID id) {
-        competitionService.deleteCompetition(id);
+        competitionService.markCompetitionAsDeleted(id);
         return ResponseEntity.noContent().build();
     }
 }

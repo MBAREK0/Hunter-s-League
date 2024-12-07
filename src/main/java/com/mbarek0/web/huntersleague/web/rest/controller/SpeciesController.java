@@ -50,10 +50,7 @@ public class SpeciesController {
 
 
     @PostMapping
-    public ResponseEntity<SpeciesResponseVM> createSpecies(HttpServletRequest request, @Valid @RequestBody SpeciesRequestVM speciesVM) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<SpeciesResponseVM> createSpecies( @Valid @RequestBody SpeciesRequestVM speciesVM) {
 
         Species species = speciesVMMapper.SpeciesRequestVMTOSpecies(speciesVM);
         Species createdSpecies = speciesService.createSpecies(species);
@@ -64,21 +61,13 @@ public class SpeciesController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SpeciesResponseVM> updateSpecies(@PathVariable UUID id,
-                                                           HttpServletRequest request,
                                                            @Valid @RequestBody SpeciesRequestVM speciesVM) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         Species updatedSpecies = speciesService.updateSpecies(id, speciesVMMapper.SpeciesRequestVMTOSpecies(speciesVM));
         return ResponseEntity.ok(speciesVMMapper.toSpeciesResponseVM(updatedSpecies));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSpecies(@PathVariable UUID id,HttpServletRequest request) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<Void> deleteSpecies(@PathVariable UUID id) {
         speciesService.deleteSpecies(id);
         return ResponseEntity.noContent().build();
     }

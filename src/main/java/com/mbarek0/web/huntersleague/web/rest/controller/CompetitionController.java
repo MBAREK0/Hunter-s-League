@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/competition")
 @RequiredArgsConstructor
+@Validated
 public class CompetitionController {
 
     private final CompetitionService competitionService;
@@ -47,30 +50,24 @@ public class CompetitionController {
         Competition competition = competitionService.getCompetitionById(id);
         return ResponseEntity.ok(CompetitionVMMapper.toCompetitionResponseVM(competition));
     }
+
     @GetMapping("/details/{id}")
     public ResponseEntity<CompetitionRepoDTO> getCompetitionDetailsById(@PathVariable UUID id) {
         CompetitionRepoDTO competition = competitionService.getCompetitionDetailsById(id);
         return ResponseEntity.ok(competition);
     }
 
-
-
     @PostMapping
-    public ResponseEntity<CompetitionResponseVM> createCompetition(HttpServletRequest request, @Valid @RequestBody CompetitionRequestVM competition) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    //CAN_MANAGE_COMPETITIONS
+    @PreAuthorize("hasAuthority('CAN_MANAGE_COMPETITIONS')")
+    public ResponseEntity<CompetitionResponseVM> createCompetition(@Valid @RequestBody CompetitionRequestVM competition) {
         Competition createdCompetition = competitionService.createCompetition(CompetitionVMMapper.CompetitionRequestVMToCompetition(competition));
         return ResponseEntity.status(HttpStatus.CREATED).body(CompetitionVMMapper.toCompetitionResponseVM(createdCompetition));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CompetitionResponseVM> updateCompetition(@PathVariable UUID id,
-                                                                    HttpServletRequest request,
                                                                   @Valid @RequestBody CompetitionRequestVM competitionDetails) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
 
         Competition competition = CompetitionVMMapper.CompetitionRequestVMToCompetition(competitionDetails);
         Competition updatedCompetition = competitionService.updateCompetition(competition,id);

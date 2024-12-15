@@ -7,9 +7,11 @@ import com.mbarek0.web.huntersleague.web.vm.request.HuntRequestVM;
 import com.mbarek0.web.huntersleague.web.vm.response.HuntResponseVM;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@PreAuthorize("hasRole('JURY')")
 @RequestMapping("/api/v1/hunts")
 @RequiredArgsConstructor
 public class HuntController {

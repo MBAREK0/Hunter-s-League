@@ -32,6 +32,7 @@ public class CompetitionController {
     private final CompetitionVMMapper CompetitionVMMapper;
 
     @GetMapping
+    @PreAuthorize("HasAuthority('CAN_VIEW_COMPETITIONS')")
     public ResponseEntity<List<CompetitionResponseVM>> getAllCompetitions(@RequestParam(required = false) String searchKeyword,
                                                                           @RequestParam(defaultValue = "0") int page,
                                                                           @RequestParam(defaultValue = "10") int size) {
@@ -46,12 +47,14 @@ public class CompetitionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("HasAuthority('CAN_VIEW_COMPETITIONS')")
     public ResponseEntity<CompetitionResponseVM> getCompetitionById(@PathVariable UUID id) {
         Competition competition = competitionService.getCompetitionById(id);
         return ResponseEntity.ok(CompetitionVMMapper.toCompetitionResponseVM(competition));
     }
 
     @GetMapping("/details/{id}")
+    @PreAuthorize("HasAuthority('CAN_VIEW_COMPETITIONS')")
     public ResponseEntity<CompetitionRepoDTO> getCompetitionDetailsById(@PathVariable UUID id) {
         CompetitionRepoDTO competition = competitionService.getCompetitionDetailsById(id);
         return ResponseEntity.ok(competition);
@@ -66,6 +69,7 @@ public class CompetitionController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_COMPETITIONS')")
     public ResponseEntity<CompetitionResponseVM> updateCompetition(@PathVariable UUID id,
                                                                   @Valid @RequestBody CompetitionRequestVM competitionDetails) {
 
@@ -76,6 +80,7 @@ public class CompetitionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('CAN_MANAGE_COMPETITIONS')")
     public ResponseEntity<Void> deleteCompetition(@PathVariable UUID id) {
         competitionService.markCompetitionAsDeleted(id);
         return ResponseEntity.noContent().build();

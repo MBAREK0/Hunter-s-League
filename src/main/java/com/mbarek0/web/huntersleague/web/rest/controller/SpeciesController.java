@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/v1/species")
 @RequiredArgsConstructor
 public class SpeciesController {
@@ -29,8 +31,7 @@ public class SpeciesController {
 
     @GetMapping
     public ResponseEntity<List<SpeciesResponseVM>> getAllSpecies(@RequestParam(required = false) SpeciesType category,
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size) {
+                                                                    @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<Species> speciesPage = (category != null)
                 ? speciesService.getSpeciesByCategory(category, page, size)
                 : speciesService.getAllSpecies(page, size);

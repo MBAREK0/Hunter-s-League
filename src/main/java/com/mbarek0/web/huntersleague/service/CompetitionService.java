@@ -1,7 +1,6 @@
 package com.mbarek0.web.huntersleague.service;
 
 import com.mbarek0.web.huntersleague.model.Competition;
-import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.CompetitionRepository;
 import com.mbarek0.web.huntersleague.repository.dto.CompetitionRepoDTO;
 import com.mbarek0.web.huntersleague.web.exception.FieldCannotBeNullException;

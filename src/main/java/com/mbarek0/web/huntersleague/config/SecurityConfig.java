@@ -36,10 +36,16 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
+
                 )
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                    .oauth2Login(oauth2 -> oauth2
+                            .defaultSuccessUrl("/", true)
+                            .failureUrl("/api/auth/login?error=true")
+                    )
                     .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

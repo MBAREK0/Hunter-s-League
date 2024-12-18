@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  jinkis:
+    image: jenkins/jenkins:lts
+    container_name: jinkis
+    restart: unless-stopped
+    networks:
+      - jinkis-network
+    ports:
+      - "8082:8080"
+      - "50000:50000" # For Jenkins agent communication
+    volumes:
+      - C:\Users\Youcode\jinkis_home:/var/jenkins_home
+
+networks:
+  jinkis-network:
+    driver: bridge
+
+volumes:
+  jinkis_home:

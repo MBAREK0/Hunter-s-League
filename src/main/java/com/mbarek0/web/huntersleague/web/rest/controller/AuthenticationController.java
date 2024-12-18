@@ -26,7 +26,6 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.register(userDTO));
     }
 
-
     @PostMapping("/login")
     public ResponseEntity<TokenVM> login(@RequestBody @Valid LoginFormVM request) {
 

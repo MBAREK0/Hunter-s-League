@@ -1,93 +1,54 @@
 package com.mbarek0.web.huntersleague.filter;
 
-import com.mbarek0.web.huntersleague.model.enums.Role;
+import com.mbarek0.web.huntersleague.service.CustomUserDetailsService;
 import com.mbarek0.web.huntersleague.service.JwtService;
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.FilterConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Component
-public class JwtAuthenticationFilter implements Filter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;  // Assume JwtService handles token parsing and validation
+    private final JwtService jwtUtil;
+    private final CustomUserDetailsService userDetailsService;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
-        this.jwtService = jwtService;
+    public JwtAuthenticationFilter(JwtService jwtUtil, CustomUserDetailsService userDetailsService) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
-    public void doFilter(jakarta.servlet.ServletRequest request, jakarta.servlet.ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
 
-        String requestURI = httpRequest.getRequestURI();
-        if (requestURI.startsWith("/api/auth/")) {
-            chain.doFilter(request, response);
-            return;
-        }
+        try {
+            String header = request.getHeader("Authorization");
+            if (header != null && header.startsWith("Bearer ")) {
+                String token = header.substring(7);
+                String username = jwtUtil.extractUsername(token);
 
-        String authHeader = httpRequest.getHeader("Authorization");
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
-            if (jwtService.validateToken(token)) {
+                    if (jwtUtil.isTokenValid(token, userDetails.getUsername())) {
+                        var authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
 
-                String username = jwtService.extractUsername(token);
-                Role role = jwtService.extractRole(username);
-
-                if (isAuthorized(role, requestURI)) {
-                    httpRequest.setAttribute("role", role);
-                } else {
-                    httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    return;
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
-
-                if (jwtService.isTokenValid(token, username)) {
-                    httpRequest.setAttribute("username", username);
-
-                } else {
-                    httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    return;
-                }
-
-            } else {
-                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
             }
-        } else {
-            httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return;
+        } catch (Exception e) {
+            logger.error("Cannot set user authentication: {}", e);
         }
-
         chain.doFilter(request, response);
-    }
-
-    private boolean isAuthorized(Role role, String requestURI) {
-
-        if (role.equals(Role.ADMIN)) {
-            return true;
-        }
-        if (requestURI.startsWith("/api/member") && role.equals(Role.MEMBER)) {
-            return true;
-        }
-        if ((requestURI.startsWith("/api/jury") || requestURI.startsWith("/api/member")) && role.equals(Role.JURY)) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) {
-    }
-
-    @Override
-    public void destroy() {
     }
 }

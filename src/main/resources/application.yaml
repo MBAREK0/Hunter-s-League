@@ -1,11 +1,25 @@
 spring:
   application:
     name: Hunts
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: Hunter_s_League
+            client-secret: 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
+            scope: openid
+            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/MBAREK0
+
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/hunts
     username: user
     password: password
+
   jpa:
     hibernate:
       ddl-auto: none
@@ -15,18 +29,25 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: public
+
+
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/master.yaml
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+
   docker:
     compose:
       file: src/main/docker/compose.yaml
       enabled: false
       lifecycle-management: start_only
 
-  output:
-    ansi:
-      enabled: always
+logging:
+  level:
+    org:
+      springframework:
+        security: TRACE
+server:
+  port: 8081
+
+# doc => https://medium.com/javarevisited/keycloak-integration-with-spring-security-6-37999f43ec85

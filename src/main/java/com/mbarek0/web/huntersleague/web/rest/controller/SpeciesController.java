@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/v1/species")
 @RequiredArgsConstructor
 public class SpeciesController {
@@ -29,8 +31,7 @@ public class SpeciesController {
 
     @GetMapping
     public ResponseEntity<List<SpeciesResponseVM>> getAllSpecies(@RequestParam(required = false) SpeciesType category,
-                                                                    @RequestParam(defaultValue = "0") int page,
-                                                                    @RequestParam(defaultValue = "10") int size) {
+                                                                    @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<Species> speciesPage = (category != null)
                 ? speciesService.getSpeciesByCategory(category, page, size)
                 : speciesService.getAllSpecies(page, size);
@@ -50,10 +51,7 @@ public class SpeciesController {
 
 
     @PostMapping
-    public ResponseEntity<SpeciesResponseVM> createSpecies(HttpServletRequest request, @Valid @RequestBody SpeciesRequestVM speciesVM) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<SpeciesResponseVM> createSpecies( @Valid @RequestBody SpeciesRequestVM speciesVM) {
 
         Species species = speciesVMMapper.SpeciesRequestVMTOSpecies(speciesVM);
         Species createdSpecies = speciesService.createSpecies(species);
@@ -64,21 +62,13 @@ public class SpeciesController {
 
     @PutMapping("/{id}")
     public ResponseEntity<SpeciesResponseVM> updateSpecies(@PathVariable UUID id,
-                                                           HttpServletRequest request,
                                                            @Valid @RequestBody SpeciesRequestVM speciesVM) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-
         Species updatedSpecies = speciesService.updateSpecies(id, speciesVMMapper.SpeciesRequestVMTOSpecies(speciesVM));
         return ResponseEntity.ok(speciesVMMapper.toSpeciesResponseVM(updatedSpecies));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSpecies(@PathVariable UUID id,HttpServletRequest request) {
-        if (!Helper.isAuthorized(request, Role.ADMIN)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+    public ResponseEntity<Void> deleteSpecies(@PathVariable UUID id) {
         speciesService.deleteSpecies(id);
         return ResponseEntity.noContent().build();
     }

@@ -10,10 +10,8 @@ import com.mbarek0.web.huntersleague.repository.UserRepository;
 import com.mbarek0.web.huntersleague.util.PasswordUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.apache.bcel.classfile.Field;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 
@@ -123,18 +121,6 @@ public class UserService {
         return userRepository.save(existingUser);
     }
 
-
-//  @Transactional
-//    public void markCompetitionAsDeleted(UUID competitionId) {
-//        // Mark the competition as deleted
-//        competitionRepository.findById(competitionId).ifPresent(competition -> {
-//            competition.setDeleted(true);
-//            competitionRepository.save(competition);
-//
-//            // Create a job for cascading delete
-//            jobProcessorService.createCascadeDeleteJob(competitionId, "COMPETITION");
-//        });
-//    }
 
     @Transactional
     public boolean markUserAsDeleted(UUID userId) {

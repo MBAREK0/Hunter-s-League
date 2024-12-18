@@ -8,9 +8,9 @@ import com.mbarek0.web.huntersleague.web.vm.response.TokenVM;
 import com.mbarek0.web.huntersleague.web.vm.request.RegisterVM;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.UserRepository;
-import com.mbarek0.web.huntersleague.util.PasswordUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,41 +22,55 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final UserVMMapper userVMMapper;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder; // Inject PasswordEncoder
     private final LocalDateTime licenseExpirationDate = LocalDateTime.now().plusYears(1);
 
-
-
+    /**
+     * Registers a new user.
+     * @param registerVM the registration data
+     * @return TokenVM containing the generated token for the new user
+     */
     public TokenVM register(@Valid RegisterVM registerVM) {
-
+        // Validate username and email uniqueness
         userService.findByUsername(registerVM.getUsername())
-                .ifPresent(value -> {
-                    throw new UserNameAlreadyExistsException("User already exists");
+                .ifPresent(existingUser -> {
+                    throw new UserNameAlreadyExistsException("Username already exists");
                 });
 
         userService.findByEmail(registerVM.getEmail())
-                .ifPresent(value -> {
+                .ifPresent(existingUser -> {
                     throw new UserNameAlreadyExistsException("Email already exists");
                 });
 
+        // Map RegisterVM to User entity
         User newUser = userVMMapper.registerVMtoUser(registerVM);
 
-        newUser.setPassword(PasswordUtil.hashPassword(newUser.getPassword()));
+        // Set default values
+        newUser.setPassword(passwordEncoder.encode(newUser.getPassword())); // Use PasswordEncoder
         newUser.setJoinDate(LocalDateTime.now());
         newUser.setLicenseExpirationDate(licenseExpirationDate);
-        newUser.setRole(Role.MEMBER);
+        newUser.setRole(Role.MEMBER); // Default role: MEMBER
 
-        User user =  userRepository.save(newUser);
-        String authToken = jwtService.generateToken(user.getUsername());
+        // Save user and generate token
+        User savedUser = userRepository.save(newUser);
+        String authToken = jwtService.generateToken(savedUser.getUsername());
 
+        // Return the token in a response object
         return TokenVM.builder().token(authToken).build();
-
     }
 
+    /**
+     * Authenticates a user by validating username and password.
+     * @param username the username
+     * @param password the plaintext password
+     * @return TokenVM containing the generated token for the authenticated user
+     */
     public TokenVM login(String username, String password) {
         return userRepository.findByUsernameAndDeletedFalse(username)
-                .filter(user -> PasswordUtil.checkPassword(password, user.getPassword()))
-                .map(user -> {
-                    String authToken = jwtService.generateToken(user.getUsername());
+                .filter(user -> passwordEncoder.matches(password, user.getPassword())) // Use PasswordEncoder
+                .map(authenticatedUser -> {
+                    // Generate JWT token for the authenticated user
+                    String authToken = jwtService.generateToken(authenticatedUser.getUsername());
                     return TokenVM.builder()
                             .token(authToken)
                             .build();

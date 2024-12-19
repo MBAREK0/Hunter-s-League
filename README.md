@@ -1,2 +1,2 @@
-﻿# Hunter's League -
+﻿# Hunter's League 
  

@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/NabilElHakimi/nbtechfront.git'
+                git branch: 'main', url: 'https://github.com/MBAREK0/Hunter-s-League.git'
             }
         }
         stage('Build Project') {

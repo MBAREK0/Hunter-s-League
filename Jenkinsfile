@@ -1,22 +1,32 @@
 pipeline {
     agent any
     stages {
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                git(url: 'https://github.com/MBAREK0/Hunter-s-League.git', branch: 'main')
+                git branch: 'main', url: 'https://github.com/MBAREK0/Hunter-s-League.git'
             }
         }
-
+        stage('Set Maven Wrapper Permissions') {
+            steps {
+                sh 'chmod +x ./mvnw'
+            }
+        }
+        stage('Build Project') {
+            steps {
+                sh './mvnw clean package -DskipTests'
+            }
+        }
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqube') {
-                    sh """
-                    sonar-scanner \
-                    -Dsonar.projectKey=Hunters-League \
-                    -Dsonar.sources=src \
-                    -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=squ_f64f16fd9d5e6d2a043c7062e2ded4f7f99beda9
-                    """
+                withSonarQubeEnv('SonarQube') {
+                    sh './mvnw sonar:sonar'
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }

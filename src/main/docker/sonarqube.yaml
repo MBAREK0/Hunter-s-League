@@ -4,6 +4,7 @@ services:
   sonarqube:
     image: sonarqube:latest
     container_name: sonarqube
+    restart: unless-stopped
     ports:
       - "9000:9000"
     environment:
@@ -13,18 +14,19 @@ services:
     depends_on:
       - db
     networks:
-      - sonarnet
+      - shared-network
 
   db:
     image: postgres:latest
     container_name: sonarqube_db
+    restart: unless-stopped
     environment:
       - POSTGRES_USER=sonarqube
       - POSTGRES_PASSWORD=sonarqube
       - POSTGRES_DB=sonarqube
     networks:
-      - sonarnet
+      - shared-network
 
 networks:
-  sonarnet:
-    driver: bridge
+  shared-network:
+    external: true

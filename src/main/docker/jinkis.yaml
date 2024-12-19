@@ -6,7 +6,7 @@ services:
     container_name: jinkis
     restart: unless-stopped
     networks:
-      - jinkis-network
+      - shared-network
     ports:
       - "8082:8080"
       - "50000:50000" # For Jenkins agent communication
@@ -14,8 +14,5 @@ services:
       - C:\Users\Youcode\jinkis_home:/var/jenkins_home
 
 networks:
-  jinkis-network:
-    driver: bridge
-
-volumes:
-  jinkis_home:
+  shared-network:
+    external: true

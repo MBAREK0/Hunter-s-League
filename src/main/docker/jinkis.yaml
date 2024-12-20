@@ -5,14 +5,29 @@ services:
     image: jenkins/jenkins:lts
     container_name: jinkis
     restart: unless-stopped
+    user: root
     networks:
       - shared-network
     ports:
       - "8082:8080"
-      - "50000:50000" # For Jenkins agent communication
+      - "50000:50000" # Pour la communication avec les agents Jenkins
     volumes:
       - C:\Users\Youcode\jinkis_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # Partager le socket Docker de l'hôte
 
 networks:
   shared-network:
     external: true
+
+
+# to install docker on debian
+#  apt-get update
+#
+#  apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg
+#
+#  curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+#
+#  echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+#  apt-get update
+#
+#  apt-get install -y docker-ce docker-ce-cli containerd.io

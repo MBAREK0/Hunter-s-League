@@ -43,20 +43,11 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image to Docker Hub') {
-               steps {
-                   script {
-                       docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                           sh 'docker tag huntersleagueimage:latest mbarek2000/huntersleagueimage:latest'
-                           sh 'docker push mbarek2000/huntersleagueimage:latest'
-                       }
-                   }
-               }
-        }
+
         stage('Run Docker Container') {
            steps {
                script {
-                   sh 'docker run -d --name huntersleague-container -p 8000:8080 mbarek2000/huntersleagueimage:latest'
+                   sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
                }
            }
         }

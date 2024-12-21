@@ -47,7 +47,7 @@ pipeline {
                steps {
                    script {
                        docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
-                           sh 'docker tag myapp:latest mbarek2000/huntersleagueimage:latest'
+                           sh 'docker tag huntersleagueimage:latest mbarek2000/huntersleagueimage:latest'
                            sh 'docker push mbarek2000/huntersleagueimage:latest'
                        }
                    }

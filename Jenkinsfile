@@ -8,7 +8,7 @@ pipeline {
         }
         stage('Clone Repository') {
             steps {
-                git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/MBAREK0/Hunter-s-League.git'
+                git branch: 'main', url: 'https://github.com/MBAREK0/Hunter-s-League.git'
             }
         }
         stage('Set Maven Wrapper Permissions') {

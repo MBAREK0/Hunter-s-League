@@ -1,18 +1,6 @@
 spring:
   application:
     name: Hunts
-#  security:
-#    oauth2:
-#      client:
-#        registration:
-#          keycloak:
-#            client-id: Hunter_s_League
-#            client-secret: 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
-#            scope: openid
-#            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
-#        provider:
-#          keycloak:
-#            issuer-uri: http://localhost:8080/realms/MBAREK0
 
   datasource:
     driver-class-name: org.postgresql.Driver

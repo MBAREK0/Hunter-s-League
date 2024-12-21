@@ -42,10 +42,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                    .oauth2Login(oauth2 -> oauth2
-                            .defaultSuccessUrl("/", true)
-                            .failureUrl("/api/auth/login?error=true")
-                    )
+//                    .oauth2Login(oauth2 -> oauth2
+//                            .defaultSuccessUrl("/", true)
+//                            .failureUrl("/api/auth/login?error=true")
+//                    )
                     .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

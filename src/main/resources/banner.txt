@@ -1,9 +1,5 @@
- ${AnsiColor.CYAN}   █████████                                     ${AnsiColor.MAGENTA} █████       ███
- ${AnsiColor.CYAN}  ███░░░░░███                                    ${AnsiColor.MAGENTA}░░███       ░░░
- ${AnsiColor.CYAN} ███     ░░░   ██████   █████████████    ██████  ${AnsiColor.MAGENTA} ░███████   ████  █████ █████  ██████
- ${AnsiColor.CYAN}░███          ░░░░░███ ░░███░░███░░███  ███░░███ ${AnsiColor.MAGENTA} ░███░░███ ░░███ ░░███ ░░███  ███░░███
- ${AnsiColor.CYAN}░███    █████  ███████  ░███ ░███ ░███ ░███████  ${AnsiColor.MAGENTA} ░███ ░███  ░███  ░███  ░███ ░███████
- ${AnsiColor.CYAN}░░███  ░░███  ███░░███  ░███ ░███ ░███ ░███░░░   ${AnsiColor.MAGENTA} ░███ ░███  ░███  ░░███ ███  ░███░░░
- ${AnsiColor.CYAN} ░░█████████ ░░████████ █████░███ █████░░██████  ${AnsiColor.MAGENTA} ████ █████ █████  ░░█████   ░░██████
- ${AnsiColor.CYAN}  ░░░░░░░░░   ░░░░░░░░ ░░░░░ ░░░ ░░░░░  ░░░░░░   ${AnsiColor.MAGENTA}░░░░ ░░░░░ ░░░░░    ░░░░░     ░░░░░░
- ${AnsiColor.BRIGHT_YELLOW}:: M'barek :: Running Spring Boot ${spring-boot.version}::${AnsiColor.DEFAULT}
+  _   _ _   _ _   _ _____ _____ ____  
+ | | | | | | | \ | |_   _| ____|  _ \ 
+ | |_| | | | |  \| | | | |  _| | |_) |
+ |  _  | |_| | |\  | | | | |___|  _ < 
+ |_| |_|\___/|_| \_| |_| |_____|_| \_\

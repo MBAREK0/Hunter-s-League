@@ -33,9 +33,27 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t myapp:latest .'
+                    sh 'docker build -t huntersLeagueImage:latest .'
                 }
             }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+               steps {
+                   script {
+                       docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-credentials') {
+                           sh 'docker tag myapp:latest mbarek2000/huntersLeagueImage:latest'
+                           sh 'docker push mbarek2000/huntersLeagueImage:latest'
+                       }
+                   }
+               }
+        }
+        stage('Run Docker Container') {
+           steps {
+               script {
+                   sh 'docker run -d --name huntersLeague-container -p 8000:8080 mbarek2000/huntersLeagueImage:latest'
+               }
+           }
         }
     }
 }

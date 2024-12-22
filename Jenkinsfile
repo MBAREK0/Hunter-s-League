@@ -46,9 +46,15 @@ pipeline {
 
         stage('Run Docker Container') {
            steps {
-               script {
-                   sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
-               }
+                 script {
+                     sh '''
+                     if [ $(docker ps -q -f name=huntersleague-container) ]; then
+                         docker stop huntersleague-container
+                         docker rm huntersleague-container
+                     fi
+                     '''
+                     sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
+                 }
            }
         }
     }

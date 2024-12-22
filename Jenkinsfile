@@ -43,17 +43,28 @@ pipeline {
             }
         }
         stage('Run Docker Container') {
-           steps {
-               script {
-                   sh '''
-                   if [ $(docker ps -q -f name=huntersleague-container) ]; then
-                       docker stop huntersleague-container
-                       docker rm huntersleague-container
-                   fi
-                   '''
-                   sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
-               }
-           }
+            steps {
+                script {
+                    sh '''
+                    if [ $(docker ps -q -f name=huntersleague-container) ]; then
+                        docker stop huntersleague-container
+                        docker rm huntersleague-container
+                    fi
+                    '''
+                    sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
+                }
+            }
+        }
+        stage('Send Test Email') {
+            steps {
+                script {
+                    emailext(
+                        subject: "Test Email from Jenkins Pipeline",
+                        body: "This is a test email sent as part of the pipeline to validate email functionality.",
+                        to: 'elaadraouimbarek2023@gmail.com'
+                    )
+                }
+            }
         }
     }
     post {

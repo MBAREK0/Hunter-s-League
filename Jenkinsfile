@@ -68,7 +68,7 @@ pipeline {
                 <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                 """,
                 mimeType: 'text/html',
-                to: 'mbarekelaadraoui@gmail.com'
+                to: 'elaadraouimbarek2023@gmail.com'
             )
         }
         failure {
@@ -82,7 +82,7 @@ pipeline {
                 <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
                 """,
                 mimeType: 'text/html',
-                to: 'mbarekelaadraoui@gmail.com'
+                to: 'elaadraouimbarek2023@gmail.com'
             )
         }
     }

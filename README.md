@@ -38,12 +38,43 @@ This document outlines the steps and configurations required to set up a CI/CD p
    ```bash
    docker pull jenkins/jenkins:lts
    ```
-2. Run the Jenkins container:
+2. Run the Jenkins container from docker compose:
    ```bash
-   docker run -d -p 8080:8080 -p 50000:50000 --name jenkins \
-      -v jenkins_home:/var/jenkins_home jenkins/jenkins:lts
+   version: '3.8'
+   services:
+     jinkis:
+       image: jenkins/jenkins:lts
+       container_name: jinkis
+       restart: unless-stopped
+       user: root
+       networks:
+         - shared-network
+       ports:
+         - "8082:8080"
+         - "50000:50000" # Pour la communication avec les agents Jenkins
+       volumes:
+         - C:\Users\Youcode\jinkis_home1:/var/jenkins_home
+         - /var/run/docker.sock:/var/run/docker.sock # Partager le socket Docker de l'hôte
+   
+   networks:
+     shared-network:
+       external: true
    ```
-3. Access Jenkins at `http://<server-ip>:8080` and complete the setup wizard.
+   ### install docker inside jenkis container
+   ```bash
+        apt-get update
+
+        apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg
+      
+        curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+      
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee                   /etc/apt/sources.list.d/docker.list > /dev/null
+   
+        apt-get update
+      
+        apt-get install -y docker-ce docker-ce-cli containerd.io
+   ```
+4. Access Jenkins at `http://<server-ip>:8080` and complete the setup wizard.
 
 ### Step 2: Install Required Plugins
 - Install the following plugins:
@@ -52,10 +83,13 @@ This document outlines the steps and configurations required to set up a CI/CD p
   - **Email Extension Plugin**
   - **SonarQube Scanner**
   - **Jacoco Plugin**
+  - **Blue ocean**
 
 ---
 
 ## Jenkins Pipeline Configuration
+### add credentials ;
+Go to Jenkins Dashboard > **Administer Jenkins** > **Credentials** > **Global** > add github,docer,sonarqube and gmail Credentials.
 
 ### Step 1: Create a New Pipeline
 1. Go to Jenkins Dashboard > **New Item** > **Pipeline**.

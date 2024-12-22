@@ -42,20 +42,48 @@ pipeline {
                 }
             }
         }
-
-
         stage('Run Docker Container') {
            steps {
-                 script {
-                     sh '''
-                     if [ $(docker ps -q -f name=huntersleague-container) ]; then
-                         docker stop huntersleague-container
-                         docker rm huntersleague-container
-                     fi
-                     '''
-                     sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
-                 }
+               script {
+                   sh '''
+                   if [ $(docker ps -q -f name=huntersleague-container) ]; then
+                       docker stop huntersleague-container
+                       docker rm huntersleague-container
+                   fi
+                   '''
+                   sh 'docker run -d --name huntersleague-container -p 8000:8080 huntersleagueimage:latest'
+               }
            }
+        }
+    }
+    post {
+        success {
+            emailext(
+                subject: "Pipeline Passed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h3>Pipeline Passed</h3>
+                <p>The pipeline has completed successfully.</p>
+                <p>Job Name: ${env.JOB_NAME}</p>
+                <p>Build Number: ${env.BUILD_NUMBER}</p>
+                <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                mimeType: 'text/html',
+                to: 'mbarekelaadraoui@gmail.com'
+            )
+        }
+        failure {
+            emailext(
+                subject: "Pipeline Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+                <h3>Pipeline Failed</h3>
+                <p>The pipeline has failed.</p>
+                <p>Job Name: ${env.JOB_NAME}</p>
+                <p>Build Number: ${env.BUILD_NUMBER}</p>
+                <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                """,
+                mimeType: 'text/html',
+                to: 'mbarekelaadraoui@gmail.com'
+            )
         }
     }
 }

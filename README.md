@@ -1,4 +1,5 @@
 # CI/CD Pipeline Documentation for Java Spring Boot Project
+![Jenkins Setup Wizard](C:\Users\Youcode\Desktop\_PROJECT\Hunter's League\src\main\resources\static\images\jenkins_setup_wizard.png)
 
 ## Overview
 This document outlines the steps and configurations required to set up a CI/CD pipeline for a Java Spring Boot project using Jenkins. The pipeline includes code retrieval, build, code quality analysis, testing, containerization, deployment, and notifications.

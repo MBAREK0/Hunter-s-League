@@ -6,13 +6,21 @@ import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.CompetitionRepository;
 import com.mbarek0.web.huntersleague.repository.ParticipationRepository;
 import com.mbarek0.web.huntersleague.repository.UserRepository;
+import com.mbarek0.web.huntersleague.service.dto.PodiumDTO;
+import com.mbarek0.web.huntersleague.service.dto.ParticipationResultDTO;
+import com.mbarek0.web.huntersleague.web.exception.FieldCannotBeNullException;
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionIsNotOpenForRegistrationException;
 import com.mbarek0.web.huntersleague.web.exception.competition.CompetitionNotFoundException;
+import com.mbarek0.web.huntersleague.web.exception.participation.ParticipationNotFoundException;
 import com.mbarek0.web.huntersleague.web.exception.user.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -23,6 +31,7 @@ public class ParticipationService {
     private final ParticipationRepository participationRepository;
     private final UserRepository userRepository;
     private final CompetitionRepository competitionRepository;
+    private final CompetitionService competitionService;
 
     public Participation createParticipation(UUID userId, UUID competitionId) {
 
@@ -53,5 +62,42 @@ public class ParticipationService {
     public Participation getParticipationById(UUID participationId) {
         return participationRepository.findById(participationId)
                 .orElseThrow(() -> new CompetitionNotFoundException("Participation not found with " ));
+    }
+
+    // ------------------------------- Result -------------------------------
+    public Page<ParticipationResultDTO> getUserResults(UUID userId, int page, int size) {
+        if (userId ==null){
+            throw new FieldCannotBeNullException("userId cant be null");
+        }
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Participation> participations = participationRepository.findByUserIdAndDeletedFalse(userId, pageable);
+
+        return participations.map(participation -> ParticipationResultDTO.builder()
+                .competitionCode(participation.getCompetition() != null ? participation.getCompetition().getCode() : null)
+                .speciesType(participation.getHunts() != null && !participation.getHunts().isEmpty()
+                        ? participation.getHunts().get(0).getSpecies().getCategory()
+                        : null)
+                .score(participation.getScore())
+                .build());
+    }
+
+
+    public ParticipationResultDTO getUserCompetitionResult(UUID userId, UUID competitionId) {
+        Participation participation = participationRepository.findByUserIdAndCompetitionId(userId, competitionId)
+                .orElseThrow(() -> new ParticipationNotFoundException("Participation not found for user and competition"));
+
+        return ParticipationResultDTO.builder()
+                .competitionCode(participation.getCompetition().getCode())
+                .speciesType(participation.getHunts().get(0).getSpecies().getCategory())
+                .score(participation.getScore())
+                .build();
+    }
+
+    public List<PodiumDTO> getTopThreeParticipants(UUID competitionId) {
+        if (competitionId == null){
+            throw new FieldCannotBeNullException("competitionId cant be null");
+        }
+        competitionService.getCompetitionById(competitionId);
+        return participationRepository.findTopThreeByCompetition(competitionId);
     }
 }

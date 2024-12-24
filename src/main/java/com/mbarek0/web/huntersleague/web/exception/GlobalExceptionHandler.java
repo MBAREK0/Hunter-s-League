@@ -1,20 +1,18 @@
 package com.mbarek0.web.huntersleague.web.exception;
 
 import com.mbarek0.web.huntersleague.web.exception.competition.*;
+import com.mbarek0.web.huntersleague.web.exception.participation.ParticipantLimitsException;
+import com.mbarek0.web.huntersleague.web.exception.participation.ParticipationNotFoundException;
 import com.mbarek0.web.huntersleague.web.exception.user.*;
-import org.springframework.boot.context.config.ConfigDataResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -99,6 +97,15 @@ public class GlobalExceptionHandler {
         Map<String, String> responseBody = new HashMap<>();
         responseBody.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
+    }
+
+    @ExceptionHandler(ParticipationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handleParticipationNotFoundException(
+            ParticipationNotFoundException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseBody);
     }
 
     // ---------------  CompetitionIsNotOpenForRegistrationException

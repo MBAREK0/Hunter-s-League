@@ -10,7 +10,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
@@ -18,12 +21,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@RequiredArgsConstructor
+
 @Service
 public class JwtService {
 
-    private final String SECRET = "9j3hYtrVTWihkQs73f7ikrycNPSjUIFcSkQPgVUjRKGCHYLFI2qCn4xhAFYhTfvm";
+    private final String SECRET ;
     private final UserService userService;
+
+    public JwtService(@Value("${jwt.secret.key}") String SECRET, UserService userService, UserService userService1) {
+        this.SECRET = SECRET;
+        this.userService = userService1;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

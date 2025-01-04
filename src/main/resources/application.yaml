@@ -1,13 +1,13 @@
 spring:
-  config:
-    import: optional:file:.env[.properties]
-
   application:
     name: Hunts
 
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
     driver-class-name: org.postgresql.Driver
-#    url: jdbc:postgresql://host.docker.internal:5432/hunts
+#   url: ${DOCKER_DB_URL} for docker integration
     url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
@@ -22,11 +22,9 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         default_schema: public
 
-
   liquibase:
     enabled: true
     change-log: classpath:db/changelog/master.yaml
-
 
   docker:
     compose:
@@ -34,12 +32,18 @@ spring:
       enabled: false
       lifecycle-management: start_only
 
+jwt:
+  secret:
+    key: ${JWT_SECRET_KEY}
+
 logging:
   level:
     org:
       springframework:
         security: TRACE
+
 server:
   port: 8081
 
-# doc => https://medium.com/javarevisited/keycloak-integration-with-spring-security-6-37999f43ec85
+
+# keycloak doc => https://medium.com/javarevisited/keycloak-integration-with-spring-security-6-37999f43ec85

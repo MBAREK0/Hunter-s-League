@@ -13,10 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,13 +29,23 @@ public class CompetitionService {
     private final CompetitionRepository competitionRepository;
     private final JobProcessorService jobProcessorService;
 
-    public Page<Competition> getAllCompetitions(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Competition> getAllCompetitions(int page, int size, String sortField) {
+        String sortDirection = "ASC";
+        if (Objects.equals(sortField.toLowerCase(), "date".toLowerCase())) sortDirection = "DESC";
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
         return competitionRepository.findAll(pageable);
     }
 
-    public Page<Competition> searchByCodeOrLocationOrDate(String searchKeyword, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<Competition> searchByCodeOrLocationOrDate(String searchKeyword, int page, int size, String sortField) {
+        String sortDirection = "ASC";
+        if (Objects.equals(sortField.toLowerCase(), "date".toLowerCase())) sortDirection = "DESC";
+
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
+        Pageable pageable = PageRequest.of(page, size, sort);
+
         return competitionRepository.findByCodeContainingOrLocationContainingAndDeletedFalse(searchKeyword, searchKeyword, pageable);
     }
 

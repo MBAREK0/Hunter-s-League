@@ -32,29 +32,28 @@ public class CompetitionController {
     private final CompetitionVMMapper CompetitionVMMapper;
 
     @GetMapping
-    @PreAuthorize("HasAuthority('CAN_VIEW_COMPETITIONS')")
-    public ResponseEntity<List<CompetitionResponseVM>> getAllCompetitions(@RequestParam(required = false) String searchKeyword,
+    @PreAuthorize("hasAuthority('CAN_VIEW_COMPETITIONS')")
+    public ResponseEntity<Page<CompetitionResponseVM>> getAllCompetitions(@RequestParam(required = false) String searchKeyword,
                                                                           @RequestParam(defaultValue = "0") int page,
-                                                                          @RequestParam(defaultValue = "10") int size) {
-        Page<Competition> competitions= (searchKeyword == null)
-                ? competitionService.getAllCompetitions(page, size)
-                : competitionService.searchByCodeOrLocationOrDate(searchKeyword, page, size);
+                                                                          @RequestParam(defaultValue = "10") int size,
+                                                                          @RequestParam(required = false) String sortField) {
+        Page<Competition> competitions = (searchKeyword == null || searchKeyword.isEmpty())
+                ? competitionService.getAllCompetitions(page, size, sortField)
+                : competitionService.searchByCodeOrLocationOrDate(searchKeyword, page, size, sortField);
 
-        List<CompetitionResponseVM> competitionVMs = competitions.stream()
-                .map(CompetitionVMMapper::toCompetitionResponseVM)
-                .toList();
+        Page<CompetitionResponseVM> competitionVMs = competitions.map(CompetitionVMMapper::toCompetitionResponseVM);
         return ResponseEntity.ok(competitionVMs);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("HasAuthority('CAN_VIEW_COMPETITIONS')")
+    @PreAuthorize("hasAuthority('CAN_VIEW_COMPETITIONS')")
     public ResponseEntity<CompetitionResponseVM> getCompetitionById(@PathVariable UUID id) {
         Competition competition = competitionService.getCompetitionById(id);
         return ResponseEntity.ok(CompetitionVMMapper.toCompetitionResponseVM(competition));
     }
 
     @GetMapping("/details/{id}")
-    @PreAuthorize("HasAuthority('CAN_VIEW_COMPETITIONS')")
+    @PreAuthorize("hasAuthority('CAN_VIEW_COMPETITIONS')")
     public ResponseEntity<CompetitionRepoDTO> getCompetitionDetailsById(@PathVariable UUID id) {
         CompetitionRepoDTO competition = competitionService.getCompetitionDetailsById(id);
         return ResponseEntity.ok(competition);

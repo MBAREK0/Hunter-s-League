@@ -8,6 +8,7 @@ import com.mbarek0.web.huntersleague.web.vm.response.TokenVM;
 import com.mbarek0.web.huntersleague.web.vm.request.RegisterVM;
 import com.mbarek0.web.huntersleague.model.User;
 import com.mbarek0.web.huntersleague.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,9 +55,10 @@ public class AuthenticationService {
         // Save user and generate token
         User savedUser = userRepository.save(newUser);
         String authToken = jwtService.generateToken(savedUser.getUsername());
+        String refreshToken = jwtService.generateRefreshToken(savedUser.getUsername());
 
         // Return the token in a response object
-        return TokenVM.builder().token(authToken).build();
+        return TokenVM.builder().token(authToken).refreshToken(refreshToken).build();
     }
 
     /**
@@ -71,10 +73,30 @@ public class AuthenticationService {
                 .map(authenticatedUser -> {
                     // Generate JWT token for the authenticated user
                     String authToken = jwtService.generateToken(authenticatedUser.getUsername());
+                    String refreshToken = jwtService.generateRefreshToken(authenticatedUser.getUsername());
                     return TokenVM.builder()
                             .token(authToken)
+                            .refreshToken(refreshToken)
                             .build();
                 })
                 .orElseThrow(() -> new UsernameOrPasswordInvalidException("Invalid credentials."));
+    }
+
+
+    public TokenVM refresh(String refreshToken) {
+
+       if(jwtService.isTokenExpired(refreshToken)) {
+            throw new ExpiredJwtException(null, null, "Refresh token has expired");
+        }
+        String username = jwtService.extractUsername(refreshToken);
+
+        if (!jwtService.isTokenValid(refreshToken,username )) {
+            throw new UsernameOrPasswordInvalidException("Invalid refresh token");
+        }
+
+        String newAccessToken = jwtService.generateToken(username);
+
+
+        return new TokenVM(newAccessToken, refreshToken);
     }
 }

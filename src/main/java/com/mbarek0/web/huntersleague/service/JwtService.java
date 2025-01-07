@@ -51,11 +51,25 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 10)) // Token valid for 10 days
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10 )) // 1 minute
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
+    public String generateRefreshToken(String username) {
+        return generateRefreshToken(new HashMap<>(), username);
+    }
+
+    public String generateRefreshToken(Map<String, Object> claims, String username) {
+        return Jwts
+                .builder()
+                .setClaims(claims)
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 7))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getClaims(token);
         return claimsResolver.apply(claims);
@@ -75,7 +89,7 @@ public class JwtService {
         return (extractedUsername.equals(username) && !isTokenExpired(token));
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

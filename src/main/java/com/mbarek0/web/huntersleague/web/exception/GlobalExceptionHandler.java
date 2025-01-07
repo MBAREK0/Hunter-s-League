@@ -4,6 +4,7 @@ import com.mbarek0.web.huntersleague.web.exception.competition.*;
 import com.mbarek0.web.huntersleague.web.exception.participation.ParticipantLimitsException;
 import com.mbarek0.web.huntersleague.web.exception.participation.ParticipationNotFoundException;
 import com.mbarek0.web.huntersleague.web.exception.user.*;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -158,4 +159,12 @@ public class GlobalExceptionHandler {
 //        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseBody);
 //    }
 
+    //ExpiredJwtException
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<Map<String, String>> handleExpiredJwtException(ExpiredJwtException ex) {
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("message", "Access token expired");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseBody);
+    }
 }

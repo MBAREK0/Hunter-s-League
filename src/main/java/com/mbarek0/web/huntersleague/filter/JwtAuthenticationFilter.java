@@ -2,6 +2,7 @@ package com.mbarek0.web.huntersleague.filter;
 
 import com.mbarek0.web.huntersleague.service.CustomUserDetailsService;
 import com.mbarek0.web.huntersleague.service.JwtService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,25 +31,68 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         try {
-            String header = request.getHeader("Authorization");
-            if (header != null && header.startsWith("Bearer ")) {
-                String token = header.substring(7);
+            String authHeader = request.getHeader("Authorization");
+            String refreshHeader = request.getHeader("X-Refresh-Token");
+
+            if (refreshHeader != null) {
+                handleRefreshToken(refreshHeader, response);
+                return; // Stop further processing to avoid duplicate filter execution
+            }
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
                 String username = jwtUtil.extractUsername(token);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    if (jwtUtil.isTokenValid(token, userDetails.getUsername())) {
+                    if (!jwtUtil.isTokenExpired(token) && jwtUtil.isTokenValid(token, userDetails.getUsername())) {
                         var authToken = new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
-
                         SecurityContextHolder.getContext().setAuthentication(authToken);
+                    } else if (jwtUtil.isTokenExpired(token)) {
+                        throw new ExpiredJwtException(null, null, "Access token has expired");
                     }
                 }
             }
+        } catch (ExpiredJwtException e) {
+            // Handle expired access token
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Access token expired\"}");
+            response.getWriter().flush();
+            return;
         } catch (Exception e) {
             logger.error("Cannot set user authentication: {}", e);
         }
+
         chain.doFilter(request, response);
+    }
+
+    private void handleRefreshToken(String refreshToken, HttpServletResponse response) throws IOException {
+        try {
+            String username = jwtUtil.extractUsername(refreshToken);
+            if (jwtUtil.isTokenValid(refreshToken, username)) {
+                // Generate new tokens and send them in response
+                String newAccessToken = jwtUtil.generateToken(username);
+                String newRefreshToken = jwtUtil.generateRefreshToken(username);
+
+                response.setContentType("application/json");
+                response.getWriter().write("{\"accessToken\": \"" + newAccessToken + "\", \"refreshToken\": \"" + newRefreshToken + "\"}");
+                response.getWriter().flush();
+            } else {
+                throw new ExpiredJwtException(null, null, "Refresh token is invalid or expired");
+            }
+        } catch (ExpiredJwtException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Refresh token expired\"}");
+            response.getWriter().flush();
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Invalid refresh token\"}");
+            response.getWriter().flush();
+        }
     }
 }

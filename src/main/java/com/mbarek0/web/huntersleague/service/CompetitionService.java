@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -91,7 +92,8 @@ public class CompetitionService {
         competition.setOpenRegistration(competitionDetails.getOpenRegistration());
 
         validateParticipantLimits(competition.getMinParticipants(), competition.getMaxParticipants());
-        validateCompetitionDate(competition.getDate());
+        if (!competition.getDate().equals(competitionDetails.getDate()))
+            validateUpdatedCompetitionDate(competition.getDate(),competitionDetails.getDate());
         String code = generateCompetitionCode(competition.getLocation(), competition.getDate());
         competition.setCode(code);
         getCompetitionByCode(competition.getCode())
@@ -128,6 +130,23 @@ public class CompetitionService {
         if (competitionExists) {
             throw new OnlyOneCompetitionCanBeScheduledPerWeekException("Only one competition can be scheduled per week.");
         }
+    }
+
+    private void validateUpdatedCompetitionDate(LocalDateTime oldCompetitionDate, LocalDateTime newCompetitionDate) {
+    // create interval of 7 days befor and after old date
+    // if the new date is in the interval check if the new data 7 days befor and after have just one competition( the old one)
+    // if not throw exception
+        LocalDateTime startInterval = oldCompetitionDate.minusDays(7);
+        LocalDateTime endInterval = oldCompetitionDate.plusDays(7);
+        if(newCompetitionDate.isAfter(startInterval) && newCompetitionDate.isBefore(endInterval)){
+              LocalDateTime startIntervalNew = newCompetitionDate.minusDays(7);
+              LocalDateTime endIntervalNew = newCompetitionDate.plusDays(7);
+              int totalCompetitionExists = competitionRepository.countByDateBetweenAndDeletedFalse(
+                      startIntervalNew, endIntervalNew
+              );
+            if(totalCompetitionExists > 1) throw new OnlyOneCompetitionCanBeScheduledPerWeekException("Only one competition can be scheduled per week.");
+            else return;
+        }else this.validateCompetitionDate(newCompetitionDate);
     }
 
     private void validateParticipantLimits(int minParticipants, int maxParticipants) {

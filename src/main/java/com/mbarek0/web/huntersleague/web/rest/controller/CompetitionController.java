@@ -57,6 +57,7 @@ public class CompetitionController {
     public ResponseEntity<CompetitionRepoDTO> getCompetitionDetailsById(@PathVariable UUID id) {
         CompetitionRepoDTO competition = competitionService.getCompetitionDetailsById(id);
         return ResponseEntity.ok(competition);
+
     }
 
     @PostMapping

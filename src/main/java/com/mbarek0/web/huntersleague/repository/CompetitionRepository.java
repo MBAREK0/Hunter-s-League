@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,11 +22,13 @@ public interface CompetitionRepository extends JpaRepository<Competition, UUID> 
     Optional<Competition> findByCodeAndDeletedFalse(String code);
     Optional<Competition> findByLocationAndDateAndDeletedFalse(String location, LocalDateTime date);
     boolean existsByDateBetweenAndDeletedFalse(LocalDateTime localDateTime, LocalDateTime localDateTime1);
-
+    int countByDateBetweenAndDeletedFalse(LocalDateTime localDateTime, LocalDateTime localDateTime1);
     @Query("SELECT new com.mbarek0.web.huntersleague.repository.dto.CompetitionRepoDTO(" +
             "c.id, c.location, c.date, SIZE(c.participations)) " +
             "FROM Competition c WHERE c.id = :id AND c.deleted = false")
     CompetitionRepoDTO findByIdRepoDTO(@Param("id") UUID id);
+    List<Competition> getAllByOpenRegistrationTrueAndDeletedFalse();
+    List<Competition> getAllByOpenRegistrationFalseAndDeletedFalse();
 
     @Modifying
     @Transactional

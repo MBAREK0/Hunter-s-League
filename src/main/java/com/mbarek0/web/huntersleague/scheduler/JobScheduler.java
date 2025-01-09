@@ -12,10 +12,9 @@ public class JobScheduler {
     @Autowired
     private JobProcessorService jobProcessorService;
 
-    // This will run every minute (adjust timing as needed)
+    // This will run every minute
     @Scheduled(cron = "*/10 * * * * ?")
     public void processJobs() {
-        System.out.println("Processing pending jobs...");
         jobProcessorService.processPendingJobs();
     }
 }

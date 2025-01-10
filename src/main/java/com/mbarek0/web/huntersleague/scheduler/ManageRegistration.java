@@ -12,27 +12,27 @@ import java.time.LocalDateTime;
 public class ManageRegistration {
     private final CompetitionRepository competitionRepository;
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "* */5 * * * ?")
     public void manageTrueRegistration(){
         competitionRepository.getAllByOpenRegistrationTrueAndDeletedFalse()
         .forEach(r ->  {
-            System.out.println(r);
             LocalDateTime now = LocalDateTime.now();
             if (now.isAfter(r.getDate())){
                  r.setOpenRegistration(false);
+                competitionRepository.save(r);
             }
         });
 
     }
 
-    @Scheduled(cron = "*/10 * * * * ?")
+    @Scheduled(cron = "* */5 * * * ?")
     public void manageFalseRegistration(){
         competitionRepository.getAllByOpenRegistrationFalseAndDeletedFalse()
                 .forEach(r ->  {
-                    System.out.println(r);
                     LocalDateTime now = LocalDateTime.now();
                     if (now.isBefore(r.getDate())){
                         r.setOpenRegistration(true);
+                        competitionRepository.save(r);
                     }
                 });
 

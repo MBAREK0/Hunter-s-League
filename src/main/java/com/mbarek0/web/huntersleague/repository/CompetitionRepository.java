@@ -18,8 +18,12 @@ import java.util.UUID;
 
 @Repository
 public interface CompetitionRepository extends JpaRepository<Competition, UUID> {
-    Page<Competition> findByCodeContainingOrLocationContainingAndDeletedFalse(String searchKeyword, String searchKeyword1, Pageable pageable);
-    Optional<Competition> findByCodeAndDeletedFalse(String code);
+    Page<Competition> findAllByDeletedFalse(Pageable pageable);
+    @Query(value = "SELECT * FROM competitions c WHERE c.deleted = false AND (LOWER(c.code) LIKE %:searchKeyword% OR LOWER(c.location) LIKE %:searchKeyword1%)",
+            nativeQuery = true)
+    Page<Competition> searchCompetitions(@Param("searchKeyword") String searchKeyword,
+                                         @Param("searchKeyword1") String searchKeyword1,
+                                         Pageable pageable);    Optional<Competition> findByCodeAndDeletedFalse(String code);
     Optional<Competition> findByLocationAndDateAndDeletedFalse(String location, LocalDateTime date);
     boolean existsByDateBetweenAndDeletedFalse(LocalDateTime localDateTime, LocalDateTime localDateTime1);
     int countByDateBetweenAndDeletedFalse(LocalDateTime localDateTime, LocalDateTime localDateTime1);

@@ -37,7 +37,7 @@ public class CompetitionService {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return competitionRepository.findAll(pageable);
+        return competitionRepository.findAllByDeletedFalse(pageable);
     }
 
     public Page<Competition> searchByCodeOrLocationOrDate(String searchKeyword, int page, int size, String sortField) {
@@ -47,7 +47,7 @@ public class CompetitionService {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortField);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return competitionRepository.findByCodeContainingOrLocationContainingAndDeletedFalse(searchKeyword, searchKeyword, pageable);
+        return competitionRepository.searchCompetitions(searchKeyword.toLowerCase(), searchKeyword.toLowerCase(), pageable);
     }
 
     public Competition getCompetitionById(UUID id) {
@@ -89,30 +89,35 @@ public class CompetitionService {
         competition.setSpeciesType(competitionDetails.getSpeciesType());
         competition.setMinParticipants(competitionDetails.getMinParticipants());
         competition.setMaxParticipants(competitionDetails.getMaxParticipants());
-        competition.setOpenRegistration(competitionDetails.getOpenRegistration());
+        boolean openRegistration = competitionDetails.getDate().isAfter(LocalDateTime.now());
+        competition.setOpenRegistration(openRegistration);
+
 
         validateParticipantLimits(competition.getMinParticipants(), competition.getMaxParticipants());
         if (!competition.getDate().equals(competitionDetails.getDate()))
             validateUpdatedCompetitionDate(competition.getDate(),competitionDetails.getDate());
-        String code = generateCompetitionCode(competition.getLocation(), competition.getDate());
-        competition.setCode(code);
-        getCompetitionByCode(competition.getCode())
-                .ifPresent(c -> {
-                    throw new CompetitionAlreadyExistsException("Competition with code " + c.getCode() + " already exists");
-                });
 
-        getCompetitionByLocationAndDate(competition.getLocation(), competition.getDate())
-                .ifPresent(c -> {
-                    throw new CompetitionAlreadyExistsException("Competition with location " + c.getLocation() + " and date " + c.getDate() + " already exists");
+        if (competitionDetails.getLocation() != competition.getLocation() || competitionDetails.getDate() != competition.getDate())
+        {
+            getCompetitionByLocationAndDate(competition.getLocation(), competition.getDate())
+                    .ifPresent(c -> {
+                        throw new CompetitionAlreadyExistsException("Competition with location " + c.getLocation() + " and date " + c.getDate() + " already exists");
+                    });
+        }
+
+        String code = generateCompetitionCode(competition.getLocation(), competition.getDate());
+
+       ;
+        if (competitionDetails.getCode() != code) {
+            getCompetitionByCode(competition.getCode())
+                    .ifPresent(c -> {
+                        throw new CompetitionAlreadyExistsException("Competition with code " + c.getCode() + " already exists try another date or location");
                 });
+        }
+        competition.setCode(code);
 
         return competitionRepository.save(competition);
-    }
-
-    public void deleteCompetition(UUID id) {
-        competitionRepository.softDeleteById(id);
-    }
-
+     }
 
     public Optional<Competition> getCompetitionByCode(String code) {
         return competitionRepository.findByCodeAndDeletedFalse(code);
@@ -163,7 +168,11 @@ public class CompetitionService {
     }
 
     public CompetitionRepoDTO getCompetitionDetailsById(UUID id) {
-        return competitionRepository.findByIdRepoDTO(id);
+        CompetitionRepoDTO competitionRepoDTO =  competitionRepository.findByIdRepoDTO(id);
+        if (competitionRepoDTO == null) {
+            throw new CompetitionNotFoundException("Competition not found ");
+        }
+        return competitionRepoDTO;
     }
 
     @Transactional

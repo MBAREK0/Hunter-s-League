@@ -44,11 +44,11 @@ public class ParticipationService {
             throw new CompetitionIsNotOpenForRegistrationException("Registration is closed for this competition");
 
         if (participationRepository.existsByUserAndCompetition(user, competition))
-              throw new CompetitionNotFoundException("User already registered for this competition");
+              throw new CompetitionNotFoundException("You are already registered for this competition");
 
        LocalDateTime now = LocalDateTime.now();
        if (user.getLicenseExpirationDate().isBefore(now))
-           throw new UserNotFoundException("User license is expired");
+           throw new UserNotFoundException("Your license is expired");
 
         Participation participation = new Participation(competition, user, 0.0);
 

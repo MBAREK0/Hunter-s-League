@@ -185,5 +185,4 @@ public class CompetitionService {
             // Create a job for cascading delete
             jobProcessorService.createCascadeDeleteJob(competitionId, "COMPETITION");
         });
-    }
-}
+    }}

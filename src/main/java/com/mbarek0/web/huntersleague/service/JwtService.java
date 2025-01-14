@@ -44,6 +44,8 @@ public class JwtService {
         // put permissions
         claims.put("permissions", extractRole(username).getAuthorities());
         claims.put("username", username);
+        userService.findByUsername(username).ifPresent(user -> claims.put("id", user.getId()));
+
         return Jwts
                 .builder()
                 .setClaims(claims)
